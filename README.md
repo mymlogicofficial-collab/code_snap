@@ -8,23 +8,26 @@ sandbox
 MCP compatable
 link to github, docker,, railway.
 
+
+
+
 code_snap/
-│
-├── main.js
-├── config.json
 │
 ├── agent/
 │   ├── core.js
 │   ├── engine.js
-│   ├── router.js
 │   ├── environment.js
-│   ├── mcp.js
-│   ├── skills/
-│   │   ├── code.js
-│   │   ├── files.js
-│   │   ├── images.js
-│   │   ├── voice.js
-│   │   └── system.js
+│   ├── router.js
+│   ├── plugins.js
+│   └── skills/
+│       ├── code.js
+│       ├── files.js
+│       ├── images.js
+│       ├── voice.js
+│       ├── system.js
+│       ├── autoskill.js
+│       ├── diagnostics.js
+│       └── execute.js
 │
 ├── server/
 │   ├── api.js
@@ -32,9 +35,25 @@ code_snap/
 │
 ├── ui/
 │   ├── index.html
+│   ├── debug.html
+│   ├── marketplace.html
 │   ├── style.css
-│   └── app.js
+│   ├── app.js
+│   ├── debug.js
+│   └── marketplace.js
 │
+├── utils/
+│   ├── logger.js
+│   └── errors.js
+│
+├── plugins/
+│   ├── README.md
+│   └── samplePlugin.js
+│
+├── logs/
+│   └── error.log
+│
+├── config.json
 ├── package.json
-└── README.md
-
+├── Dockerfile
+└── railway.json

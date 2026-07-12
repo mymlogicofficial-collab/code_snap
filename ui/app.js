@@ -1,31 +1,33 @@
+document.getElementById("send").onclick = async () => {
+  const text = document.getElementById("input").value;
 
-body {
-  background: #111;
-  color: #eee;
-  font-family: Arial;
-}
+  const res = await fetch("/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text })
+  });
 
-#chat {
-  width: 600px;
-  margin: auto;
-  padding-top: 40px;
-}
+  const data = await res.json();
+  addMessage("Agent: " + data.text);
+};
 
-#messages {
-  height: 400px;
-  overflow-y: scroll;
-  background: #222;
-  padding: 10px;
-  border-radius: 8px;
-}
+document.getElementById("fileUpload").onchange = async (e) => {
+  const file = e.target.files[0];
+  const form = new FormData();
+  form.append("file", file);
 
-#input {
-  width: 100%;
-  height: 80px;
-  margin-top: 10px;
-}
+  const res = await fetch("/upload", {
+    method: "POST",
+    body: form
+  });
 
-button {
-  margin-top: 10px;
-  width: 100%;
+  const data = await res.json();
+  addMessage("Agent: " + data.text);
+};
+
+function addMessage(msg) {
+  const messages = document.getElementById("messages");
+  const div = document.createElement("div");
+  div.textContent = msg;
+  messages.appendChild(div);
 }

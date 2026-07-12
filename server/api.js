@@ -1,5 +1,6 @@
 import express from "express";
 import fileUpload from "express-fileupload";
+import fs from "fs";
 import { logError, logInfo } from "../utils/logger.js";
 
 export async function startServer({ router }) {
@@ -76,6 +77,30 @@ export async function startServer({ router }) {
     } catch (err) {
       logError("API.autoskill", err.message);
       res.json({ error: "Auto-skill handler failed", details: err.message });
+    }
+  });
+
+  app.post("/execute", async (req, res) => {
+    try {
+      const { code } = req.body;
+      const result = await router.handle({
+        type: "execute",
+        code
+      });
+      res.json(result);
+    } catch (err) {
+      logError("API.execute", err.message);
+      res.json({ error: "Execute handler failed", details: err.message });
+    }
+  });
+
+  app.get("/logs", (req, res) => {
+    try {
+      const text = fs.readFileSync("logs/error.log", "utf8");
+      res.type("text/plain").send(text);
+    } catch (err) {
+      logError("API.logs", err.message);
+      res.type("text/plain").send("No logs available.");
     }
   });
 

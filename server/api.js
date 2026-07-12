@@ -1,4 +1,3 @@
-
 import express from "express";
 import fileUpload from "express-fileupload";
 
@@ -38,6 +37,16 @@ export async function startServer({ router }) {
     const result = await router.handle({
       type: "voice",
       audio
+    });
+    res.json(result);
+  });
+
+  app.post("/autoskill", async (req, res) => {
+    const { skillName, description } = req.body;
+    const result = await router.handle({
+      type: "autoskill",
+      skillName,
+      description
     });
     res.json(result);
   });

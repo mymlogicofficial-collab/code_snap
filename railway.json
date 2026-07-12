@@ -1,0 +1,12 @@
+{
+  "services": [
+    {
+      "name": "code-snap-agent",
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "dockerfilePath": "Dockerfile",
+      "restartPolicyType": "ON_FAILURE"
+    }
+  ]
+}

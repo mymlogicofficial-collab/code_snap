@@ -5,11 +5,27 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="chat">
-    <div id="messages"></div>
-    <textarea id="input"></textarea>
-    <button id="send">Send</button>
-    <input type="file" id="fileUpload">
+  <div id="app">
+    <header>
+      <h1>CodeSnap Agent</h1>
+      <p>Neon coding guru · Ollama Gemma 3:12B</p>
+    </header>
+
+    <main id="chat">
+      <div id="messages"></div>
+
+      <div id="controls">
+        <textarea id="input" placeholder="Ask your coding agent..."></textarea>
+        <div class="buttons">
+          <button id="send">Send</button>
+          <button id="voiceToggle">🎙 Hands-free</button>
+          <label class="file-label">
+            📂 Drag & Drop / Upload
+            <input type="file" id="fileUpload">
+          </label>
+        </div>
+      </div>
+    </main>
   </div>
 
   <script src="app.js"></script>

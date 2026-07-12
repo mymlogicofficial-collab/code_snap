@@ -1,5 +1,6 @@
 import axios from "axios";
 import { logError, logInfo } from "../utils/logger.js";
+import { categorizeError } from "../utils/errors.js";
 
 export class Engine {
   constructor(config) {
@@ -9,55 +10,67 @@ export class Engine {
     this.webURL = config.webURL;
     this.webKey = config.webKey;
 
+    this.failCount = 0;
+    this.maxFails = 3;
+
     logInfo("Engine", `Initialized in ${this.mode} mode`);
   }
 
   async send(prompt, attachments = {}) {
     try {
-      if (this.mode === "local") {
-        return await this.sendLocal(prompt, attachments);
-      } else {
-        return await this.sendWeb(prompt, attachments);
-      }
+      const result =
+        this.mode === "local"
+          ? await this.sendLocal(prompt, attachments)
+          : await this.sendWeb(prompt, attachments);
+
+      this.failCount = 0;
+      return result;
+
     } catch (err) {
-      logError("Engine.send", err.message);
-      return { error: "Engine failure", details: err.message };
+      const category = categorizeError(err.message);
+      logError(`Engine.${category}`, err.message);
+
+      this.failCount++;
+
+      if (this.failCount >= this.maxFails) {
+        logInfo("Engine", "Auto-recovery triggered");
+        return this.recover();
+      }
+
+      return { error: category, details: err.message };
     }
   }
 
-  async sendLocal(prompt, attachments) {
-    try {
-      const res = await axios.post(this.localURL, {
-        model: this.localModel,
-        prompt,
-        stream: false
-      });
+  async sendLocal(prompt) {
+    const res = await axios.post(this.localURL, {
+      model: this.localModel,
+      prompt,
+      stream: false
+    });
 
-      return { text: res.data.response };
-    } catch (err) {
-      logError("Engine.local", err.message);
-      return { error: "Local engine error", details: err.message };
-    }
+    return { text: res.data.response };
   }
 
   async sendWeb(prompt, attachments) {
-    try {
-      const res = await axios.post(
-        this.webURL,
-        {
-          model: "web-model",
-          prompt,
-          attachments
-        },
-        {
-          headers: { Authorization: `Bearer ${this.webKey}` }
-        }
-      );
+    const res = await axios.post(
+      this.webURL,
+      {
+        model: "web-model",
+        prompt,
+        attachments
+      },
+      {
+        headers: { Authorization: `Bearer ${this.webKey}` }
+      }
+    );
 
-      return res.data;
-    } catch (err) {
-      logError("Engine.web", err.message);
-      return { error: "Web API error", details: err.message };
-    }
+    return res.data;
+  }
+
+  recover() {
+    this.failCount = 0;
+    this.mode = "local";
+    logInfo("Engine", "Engine restarted in LOCAL mode");
+    return { text: "Engine auto-recovered and restarted." };
   }
 }

@@ -4,9 +4,6 @@ const sendBtn = document.getElementById("send");
 const fileUploadEl = document.getElementById("fileUpload");
 const voiceToggleBtn = document.getElementById("voiceToggle");
 
-let recognizing = false;
-let recognition = null;
-
 // Add message to UI
 function addMessage(text, role = "agent") {
   const div = document.createElement("div");
@@ -35,7 +32,7 @@ sendBtn.onclick = async () => {
   addMessage(reply, "agent");
 };
 
-// File upload (drag & drop / manual)
+// File upload
 fileUploadEl.onchange = async (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -55,13 +52,15 @@ fileUploadEl.onchange = async (e) => {
   addMessage(reply, "agent");
 };
 
-// Hands-free voice mode (browser STT)
+// Voice mode
+let recognizing = false;
+let recognition = null;
+
 if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
   const SpeechRecognition =
     window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SpeechRecognition();
   recognition.continuous = true;
-  recognition.interimResults = false;
 
   recognition.onresult = (event) => {
     const transcript = event.results[event.results.length - 1][0].transcript;

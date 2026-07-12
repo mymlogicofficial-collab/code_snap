@@ -1,1 +1,13 @@
-
+{
+  "engine": {
+    "mode": "local",
+    "localURL": "http://localhost:11434/api/generate",
+    "localModel": "gemma3:12b",
+    "webURL": "https://api.example.com/v1/chat",
+    "webKey": "YOUR_API_KEY"
+  },
+  "agent": {
+    "allowEnvironmentChanges": true,
+    "skillsPath": "./agent/skills/"
+  }
+}

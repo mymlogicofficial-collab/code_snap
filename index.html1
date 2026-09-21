@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CodeSnap Agent</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>CodeSnap Agent</h1>
+      <p>Neon coding guru · cieloforge/qwen2.5-coder-7b-instruct-spec:latest</p>
+      <a href="debug.html" id="debugLink">🛠 Debug Dashboard</a>
+    </header>
+
+    <main id="chat">
+      <div id="messages"></div>
+
+      <div id="controls">
+        <textarea id="input" placeholder="Ask your coding agent..."></textarea>
+        <div class="buttons">
+          <button id="send">Send</button>
+          <button id="voiceToggle">🎙 Hands-free</button>
+          <label class="file-label">
+            📂 Drag & Drop / Upload
+            <input type="file" id="fileUpload">
+          </label>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

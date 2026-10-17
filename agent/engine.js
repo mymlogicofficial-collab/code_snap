@@ -41,15 +41,16 @@ export class Engine {
     }
   }
 
-  async sendLocal(prompt) {
-    const res = await axios.post(this.localURL, {
-      model: this.localModel,
-      prompt,
-      stream: false
-    });
+  async sendLocal(prompt, attachments = {}) {
+  const res = await axios.post(this.localURL, {
+    model: attachments.model,
+    prompt,
+    stream: false,
+    images: attachments.image ? [attachments.image] : undefined
+  });
 
-    return { text: res.data.response };
-  }
+  return { text: res.data.response };
+}
 
   async sendWeb(prompt, attachments) {
     const res = await axios.post(

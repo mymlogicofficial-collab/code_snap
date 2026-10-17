@@ -7,9 +7,17 @@ import * as AutoSkill from "./skills/autoskill.js";
 import * as DiagnosticsSkill from "./skills/diagnostics.js";
 import * as ExecuteSkill from "./skills/execute.js";
 
+// === Ollama Models ===
+const CODER_MODEL = "qwen2.5-coder";
+const IMAGE_MODEL = "llava-phi3:3.8b";
+
 export class AgentRouter {
   constructor(core) {
     this.core = core;
+
+    // Attach models to core so skills can use them
+    this.core.coderModel = CODER_MODEL;
+    this.core.imageModel = IMAGE_MODEL;
   }
 
   async handle(input) {

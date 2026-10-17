@@ -10,5 +10,22 @@
   "agent": {
     "allowEnvironmentChanges": true,
     "skillsPath": "./agent/skills/"
+  },
+  "github": {
+    "token": "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",
+    "owner": "mymlogicofficial-collab",
+    "allowedRepos": ["mymlogicllc-website", "code_snap"]
+  },
+  "files": {
+    "allowedPaths": [
+      "C:\\mymlo\\projects\\design-studio",
+      "C:\\mymlo\\projects\\code_snap",
+      "C:\\mymlo\\projects\\website"
+    ],
+    "maxFileSize": 10485760
+  },
+  "server": {
+    "port": 3000,
+    "host": "localhost"
   }
 }

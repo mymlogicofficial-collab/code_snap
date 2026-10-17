@@ -7,7 +7,10 @@ export class AgentCore {
     this.environment = new Environment(config.agent);
   }
 
-  async think(prompt, attachments = {}) {
-    return this.engine.send(prompt, attachments);
-  }
+async think(prompt, attachments = {}) {
+  const model = attachments.image
+    ? this.imageModel      // llava-phi3:3.8b
+    : this.coderModel;     // qwen2.5-coder
+
+  return this.engine.send(prompt, { ...attachments, model });
 }

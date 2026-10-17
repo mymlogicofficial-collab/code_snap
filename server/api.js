@@ -1,14 +1,62 @@
 import express from "express";
 import fileUpload from "express-fileupload";
 import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import { logError, logInfo } from "../utils/logger.js";
 
+<<<<<<< Updated upstream
 export async function startServer({ router, port } = {}) {
+=======
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// === Ollama Models ===
+const CODER_MODEL = "qwen2.5-coder";
+const IMAGE_MODEL = "llava-phi3:3.8b";
+
+// === Auto-warm models (HDD friendly) ===
+async function warmModel(model) {
+  try {
+    await fetch("http://localhost:11434/api/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ model, prompt: "warmup" })
+    });
+    logInfo("Warmup", `${model} warmed`);
+  } catch (err) {
+    logError("Warmup", `Failed to warm ${model}: ${err.message}`);
+  }
+}
+
+export async function startServer({ router }) {
+>>>>>>> Stashed changes
   const app = express();
   app.use(express.json());
   app.use(fileUpload());
 
+  // Serve UI static files
+  app.use(express.static(path.join(__dirname, "../ui")));
+
   logInfo("Server", "API server starting...");
+
+  // Root route - serve debug.html
+  app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "../ui/debug.html"));
+  });
+
+  // Serve Demo-First Apps
+  app.get("/demo/fidgepop", (req, res) => {
+    res.sendFile(path.join(__dirname, "../ui/fidgepop.html"));
+  });
+
+  app.get("/demo/codeme", (req, res) => {
+    res.sendFile(path.join(__dirname, "../ui/codeme.html"));
+  });
+
+  app.get("/demo/fortune", (req, res) => {
+    res.sendFile(path.join(__dirname, "../ui/fortune.html"));
+  });
 
   app.post("/chat", async (req, res) => {
     try {
@@ -104,9 +152,37 @@ export async function startServer({ router, port } = {}) {
     }
   });
 
+<<<<<<< Updated upstream
   const listenPort = port || Number(process.env.API_PORT) || 3000;
   app.listen(listenPort, () => {
     logInfo("Server", `Listening on port ${listenPort}`);
+=======
+  app.post("/diagnostics", (req, res) => {
+    try {
+      const diagnostics = {
+        timestamp: new Date().toISOString(),
+        node_version: process.version,
+        platform: process.platform,
+        uptime: process.uptime(),
+        memory: process.memoryUsage(),
+        ollama_url: "http://localhost:11434",
+        local_model: "cieloforge/qwen2.5-coder-7b-instruct-spec:latest",
+        allowed_paths: [
+          "C:\\mymlo\\projects\\design-studio",
+          "C:\\mymlo\\projects\\code_snap",
+          "C:\\mymlo\\projects\\website"
+        ]
+      };
+      res.json(diagnostics);
+    } catch (err) {
+      logError("API.diagnostics", err.message);
+      res.json({ error: "Diagnostics failed", details: err.message });
+    }
+  });
+
+  app.listen(3000, () => {
+    logInfo("Server", "Listening on port 3000");
+>>>>>>> Stashed changes
   });
 
   return app;

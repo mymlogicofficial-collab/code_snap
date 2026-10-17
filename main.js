@@ -1,7 +1,7 @@
 import fs from "fs";
-import { AgentCore } from "agent/core.js";
-import { AgentRouter } from "agent/router.js";
-import { startServer } from "server/api.js";
+import { AgentCore } from "./agent/core.js";
+import { AgentRouter } from "./agent/router.js";
+import { startServer } from "./server/api.js";
 import "./server/proxy.js";
 
 async function bootstrap() {

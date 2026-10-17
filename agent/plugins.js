@@ -1,10 +1,11 @@
 import fs from "fs";
 import path from "path";
 import { logInfo, logError } from "../utils/logger.js";
+import { pathToFileURL } from "url";
 
 const pluginsDir = path.join("plugins");
 
-export function loadPlugins() {
+export async function loadPlugins() {
   if (!fs.existsSync(pluginsDir)) {
     fs.mkdirSync(pluginsDir);
     logInfo("Plugins", "Created plugins directory");
@@ -16,7 +17,7 @@ export function loadPlugins() {
   for (const file of files) {
     const fullPath = path.join(pluginsDir, file);
     try {
-      const mod = require(fullPath);
+      const mod = await import(pathToFileURL(fullPath).href);
       plugins.push({ name: file, module: mod });
       logInfo("Plugins", `Loaded plugin: ${file}`);
     } catch (err) {

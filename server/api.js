@@ -3,7 +3,7 @@ import fileUpload from "express-fileupload";
 import fs from "fs";
 import { logError, logInfo } from "../utils/logger.js";
 
-export async function startServer({ router }) {
+export async function startServer({ router, port } = {}) {
   const app = express();
   app.use(express.json());
   app.use(fileUpload());
@@ -104,7 +104,10 @@ export async function startServer({ router }) {
     }
   });
 
-  app.listen(3000, () => {
-    logInfo("Server", "Listening on port 3000");
+  const listenPort = port || Number(process.env.API_PORT) || 3000;
+  app.listen(listenPort, () => {
+    logInfo("Server", `Listening on port ${listenPort}`);
   });
+
+  return app;
 }

@@ -2,7 +2,8 @@
   "engine": {
     "mode": "local",
     "localURL": "http://localhost:11434/api/generate",
-    "localModel": "cieloforge/qwen2.5-coder-7b-instruct-spec:latest",
+    "localModel": "qwen2.5-coder:latest",
+    "secondaryModel": "llava-phi3:3.8",
     "webURL": "https://api.example.com/v1/chat",
     "webKey": "YOUR_API_KEY"
   },

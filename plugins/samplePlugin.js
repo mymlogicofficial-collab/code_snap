@@ -1,5 +1,3 @@
-
-```js
 import { logInfo } from "../utils/logger.js";
 
 export const plugin = {
@@ -14,7 +12,7 @@ export const plugin = {
     const response = await core.think(`Respond to: ${text}`);
     return {
       text: `Plugin executed successfully.`,
-      data: response.text
+      data: response?.text
     };
   }
 };

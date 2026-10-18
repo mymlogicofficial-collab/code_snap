@@ -5,12 +5,13 @@ export class AgentCore {
   constructor(config) {
     this.engine = new Engine(config.engine);
     this.environment = new Environment(config.agent);
+
+    // models can be attached by the router at runtime
+    this.coderModel = null;
+    this.imageModel = null;
   }
 
-async think(prompt, attachments = {}) {
-  const model = attachments.image
-    ? this.imageModel      // llava-phi3:3.8b
-    : this.coderModel;     // qwen2.5-coder
-
-  return this.engine.send(prompt, { ...attachments, model });
+  async think(prompt, attachments = {}) {
+    return this.engine.send(prompt, attachments);
+  }
 }

@@ -3,15 +3,16 @@ import { logError } from "./logger.js";
 import fs from "fs";
 
 export async function checkGitHub() {
-  const token = process.env.GITHUB_TOKEN || null;
-  // prefer config.json owner/repo if present
-  let owner = null;
-  let repo = null;
+  // Prefer env var, fall back to config.json
+  let token = process.env.GITHUB_TOKEN || null;
+  let owner = process.env.GITHUB_OWNER || null;
+  let repo = process.env.GITHUB_REPO || null;
 
   try {
     const cfg = JSON.parse(fs.readFileSync("./config.json", "utf8"));
-    owner = cfg.githubOwner || owner;
-    repo = cfg.githubRepo || repo;
+    token = token || cfg?.github?.token || cfg?.githubToken || null;
+    owner = owner || cfg?.github?.owner || cfg?.githubOwner || null;
+    repo = repo || cfg?.github?.repo || cfg?.githubRepo || null;
   } catch (err) {
     // ignore
   }

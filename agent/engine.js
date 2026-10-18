@@ -27,8 +27,9 @@ export class Engine {
       return result;
 
     } catch (err) {
-      const category = categorizeError(err.message);
-      logError(`Engine.${category}`, err.message);
+      const msg = err?.message || String(err);
+      const category = categorizeError(msg);
+      logError(`Engine.${category}`, msg);
 
       this.failCount++;
 
@@ -37,20 +38,34 @@ export class Engine {
         return this.recover();
       }
 
-      return { error: category, details: err.message };
+      return { error: category, details: msg };
     }
   }
 
   async sendLocal(prompt, attachments = {}) {
-  const res = await axios.post(this.localURL, {
-    model: attachments.model,
-    prompt,
-    stream: false,
-    images: attachments.image ? [attachments.image] : undefined
-  });
+    // Prefer going through the app proxy so model traffic stays local to the app
+    const proxyURL = process.env.PROXY_INTERNAL_URL || "http://localhost:3000/proxy/generate";
+    const target = process.env.USE_PROXY_INTERNAL === "true" ? proxyURL : this.localURL;
 
-  return { text: res.data.response };
-}
+    const payload = {
+      model: attachments.model || this.localModel,
+      prompt,
+      stream: false
+    };
+
+    if (attachments.image) payload.images = [attachments.image];
+
+    const res = await axios.post(target, payload, { timeout: 120000 });
+
+    // Support several response shapes: { response: '...' } or raw model data
+    if (res?.data && typeof res.data === "object") {
+      if (res.data.response) return { text: res.data.response };
+      if (res.data.result) return { text: res.data.result };
+      return { text: JSON.stringify(res.data) };
+    }
+
+    return { text: String(res?.data || "") };
+  }
 
   async sendWeb(prompt, attachments) {
     const res = await axios.post(

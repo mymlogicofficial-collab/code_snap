@@ -1,293 +1,284 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CodeSnap Design Studio</title>
-  <link rel="stylesheet" href="./style.css" />
-</head>
-<body>
-  <div class="studio-shell">
-    <aside class="sidebar left-panel">
-      <div class="brand-block">
-        <div class="brand-mark">C</div>
-        <div>
-          <div class="eyebrow">AI DIGITAL WORKFLOW</div>
-          <h1>CodeSnap</h1>
-        </div>
-      </div>
+:root {
+  --bg: #020b16;
+  --bg-2: #081825;
+  --panel: rgba(11, 18, 30, 0.9);
+  --panel-soft: rgba(19, 27, 41, 0.82);
+  --border: rgba(148, 163, 184, 0.16);
+  --text: #eef4ff;
+  --muted: #a8b8d1;
+  --primary: #6f67ff;
+  --primary-2: #7a7cff;
+  --primary-3: #7ca1ff;
+  --success: #2ee6a6;
+  --warning: #f6c85f;
+  --alert: #ef5a5a;
+  --shadow: 0 12px 26px rgba(2, 6, 23, 0.55);
+}
 
-      <div class="panel compact">
-        <div class="panel-header">
-          <span>Prompt</span>
-        </div>
-        <textarea id="chatInput" placeholder="Describe a landing page, dashboard, or marketing mockup..."></textarea>
-        <div class="button-row">
-          <button id="sendChat" class="primary">Send</button>
-          <button id="pasteImage" class="secondary">Paste image</button>
-        </div>
-      </div>
+* {
+  box-sizing: border-box;
+}
 
-      <div class="panel compact">
-        <div class="panel-header">
-          <span>Design assets</span>
-        </div>
-        <input id="assetUpload" type="file" accept="image/*,.png,.jpg,.jpeg,.webp,.svg" />
-        <button id="uploadAsset" class="secondary full-width">Attach reference</button>
-      </div>
-    </aside>
+html, body {
+  margin: 0;
+  min-height: 100%;
+  font-family: Inter, "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top, rgba(111, 103, 255, 0.14), transparent 30%), linear-gradient(180deg, #020b16 0%, #040d1a 100%);
+  color: var(--text);
+}
 
-    <main class="workspace">
-      <div class="topbar">
-        <div class="status-pill online">Ollama Online</div>
-        <div class="status-pill neutral">Preview Live</div>
-        <div class="status-pill neutral">Design Studio</div>
-      </div>
+body {
+  min-height: 100vh;
+  padding: 28px 28px 40px;
+}
 
-      <div class="panel preview-panel">
-        <div class="panel-header">
-          <span>Live preview</span>
-          <button id="renderHtml" class="secondary small">Render</button>
-        </div>
-        <iframe id="previewFrame" title="Design preview" sandbox="allow-scripts allow-same-origin"></iframe>
-      </div>
+button, textarea {
+  font: inherit;
+}
 
-      <div class="bottom-grid">
-        <div class="panel">
-          <div class="panel-header">
-            <span>HTML / CSS output</span>
-          </div>
-          <textarea id="htmlCode" spellcheck="false"></textarea>
-        </div>
+.app-shell {
+  max-width: 1240px;
+  margin: 0 auto;
+}
 
-        <div class="panel">
-          <div class="panel-header">
-            <span>Sandbox</span>
-          </div>
-          <textarea id="sandboxCode" spellcheck="false">console.log('sandbox ready');</textarea>
-          <div class="button-row">
-            <button id="runSandbox" class="primary">Run code</button>
-          </div>
-          <pre id="sandboxOutput">Sandbox output...</pre>
-        </div>
-      </div>
-    </main>
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0 14px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
 
-    <aside class="sidebar right-panel">
-      <div class="panel conversation-panel">
-        <div class="panel-header">
-          <span>Conversation</span>
-        </div>
-        <div id="chatMessages" class="chat-messages"></div>
-      </div>
-    </aside>
-  </div>
+.brand-mark {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  opacity: 0.95;
+}
 
-  <script>
-    const chatInput = document.getElementById('chatInput');
-    const chatMessages = document.getElementById('chatMessages');
-    const htmlCode = document.getElementById('htmlCode');
-    const sandboxCode = document.getElementById('sandboxCode');
-    const sandboxOutput = document.getElementById('sandboxOutput');
-    const previewFrame = document.getElementById('previewFrame');
+.brand-title {
+  margin: 0;
+  font-size: 2.05rem;
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+  font-weight: 800;
+}
 
-    const defaultHtml = `<!doctype html>
-<html>
-<head>
-  <style>
-    body {
-      margin: 0;
-      display: grid;
-      place-items: center;
-      min-height: 100vh;
-      font-family: Inter, Arial, sans-serif;
-      background: linear-gradient(135deg, #0f172a, #111827 35%, #1d4ed8);
-      color: white;
-    }
-    .card {
-      width: min(560px, 80vw);
-      padding: 36px;
-      border-radius: 18px;
-      background: rgba(15,23,42,.72);
-      border: 1px solid rgba(255,255,255,.12);
-      box-shadow: 0 25px 60px rgba(0,0,0,.32);
-    }
-    h1 { margin: 0 0 10px; font-size: clamp(2rem, 4vw, 3rem); }
-    p { opacity: .85; line-height: 1.6; }
-    .button {
-      display: inline-block;
-      margin-top: 16px;
-      padding: 12px 18px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, #22d3ee, #60a5fa);
-      color: #06131d;
-      font-weight: 700;
-      text-decoration: none;
-    }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <h1>Design concept</h1>
-    <p>Live preview updates as your AI generates cleaner design directions.</p>
-    <a class="button" href="#">Launch concept</a>
-  </div>
-</body>
-</html>`;
+.subhead {
+  margin: 0 0 18px;
+  font-size: 0.95rem;
+  color: rgba(200, 214, 234, 0.82);
+  letter-spacing: -0.01em;
+}
 
-    function escapeHtml(str) {
-      return str
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
 
-    function addMessage(role, text) {
-      const message = document.createElement('div');
-      message.className = `message ${role}`;
+.panel {
+  background: rgba(11, 18, 30, 0.9);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 16px 18px 18px;
+  box-shadow: var(--shadow);
+}
 
-      const label = document.createElement('div');
-      label.className = 'message-label';
-      label.textContent = role === 'user' ? 'You' : 'Agent';
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
 
-      const body = document.createElement('div');
-      body.className = 'message-body';
-      body.textContent = text;
+.panel-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
 
-      message.append(label, body);
-      chatMessages.appendChild(message);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+}
 
-    function setPreviewHtml(rawHtml) {
-      const clean = rawHtml && /<html|<body|<div|<section|<main/i.test(rawHtml)
-        ? rawHtml
-        : `<!doctype html><html><body>${rawHtml || defaultHtml}</body></html>`;
-      previewFrame.srcdoc = clean;
-      htmlCode.value = clean;
-    }
+.field-label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 0.72rem;
+  color: rgba(196, 208, 230, 0.82);
+  letter-spacing: 0.04em;
+  text-transform: none;
+  font-weight: 600;
+}
 
-    async function sendChat() {
-      const text = chatInput.value.trim();
-      if (!text) return;
+textarea {
+  width: 100%;
+  min-height: 130px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(7, 13, 22, 0.9);
+  color: var(--text);
+  resize: vertical;
+  line-height: 1.5;
+  outline: none;
+}
 
-      addMessage('user', text);
-      chatInput.value = '';
+textarea:focus {
+  border-color: rgba(122, 124, 255, 0.7);
+  box-shadow: 0 0 0 3px rgba(111, 103, 255, 0.12);
+}
 
-      try {
-        const response = await fetch('/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text })
-        });
-        const data = await response.json();
-        const replyText = data?.text || data?.content || JSON.stringify(data, null, 2);
-        addMessage('agent', replyText);
-        setPreviewHtml(replyText);
-      } catch (err) {
-        addMessage('agent', `Error: ${err.message}`);
-      }
-    }
+.primary-button,
+.secondary-button {
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
 
-    async function uploadReference(file) {
-      if (!file) return;
-      const form = new FormData();
-      form.append('image', file);
-      try {
-        const res = await fetch('/image', { method: 'POST', body: form });
-        const data = await res.json();
-        addMessage('agent', `Reference attached: ${file.name}\n${JSON.stringify(data, null, 2)}`);
-      } catch (err) {
-        addMessage('agent', `Image upload failed: ${err.message}`);
-      }
-    }
+.primary-button:hover,
+.secondary-button:hover {
+  transform: translateY(-1px);
+}
 
-    function handlePaste(event) {
-      const items = event.clipboardData?.items || [];
-      for (const item of items) {
-        if (item.type.startsWith('image/')) {
-          event.preventDefault();
-          const file = item.getAsFile();
-          if (file) uploadReference(file);
-          break;
-        }
-      }
-    }
+.primary-button {
+  margin-top: 14px;
+  background: linear-gradient(135deg, var(--primary), #8b6dfb);
+  color: white;
+  box-shadow: 0 10px 20px rgba(111, 103, 255, 0.24);
+}
 
-    function renderSandboxCode() {
-      const code = sandboxCode.value.trim();
-      if (!code) return;
+.secondary-button {
+  background: rgba(148, 163, 184, 0.09);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
 
-      const iframe = document.createElement('iframe');
-      iframe.setAttribute('sandbox', 'allow-scripts');
-      iframe.style.display = 'none';
-      document.body.appendChild(iframe);
+.muted-button {
+  background: rgba(255, 255, 255, 0.03);
+}
 
-      const doc = iframe.contentWindow.document;
-      doc.open();
-      doc.write('<!doctype html><html><body></body></html>');
-      doc.close();
+.button-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
 
-      const log = [];
-      const nativeLog = console.log;
-      console.log = (...args) => {
-        log.push(args.map(String).join(' '));
-        nativeLog(...args);
-      };
+.compact-row {
+  margin-top: 12px;
+}
 
-      try {
-        iframe.contentWindow.eval(code);
-        sandboxOutput.textContent = log.length ? log.join('\n') : 'Code executed without console output.';
-      } catch (err) {
-        sandboxOutput.textContent = `Runtime error: ${err.message}`;
-      } finally {
-        console.log = nativeLog;
-        iframe.remove();
-      }
-    }
+.output-panel {
+  margin-top: 14px;
+  min-height: 90px;
+  max-height: 180px;
+  overflow: auto;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(4, 10, 18, 0.95);
+  color: rgba(223, 233, 246, 0.9);
+  padding: 12px 14px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  font-family: "SFMono-Regular", Consolas, monospace;
+}
 
-    document.getElementById('sendChat').addEventListener('click', sendChat);
-    document.getElementById('renderHtml').addEventListener('click', () => setPreviewHtml(htmlCode.value || defaultHtml));
-    document.getElementById('runSandbox').addEventListener('click', renderSandboxCode);
-    document.getElementById('pasteImage').addEventListener('click', async () => {
-      try {
-        const clipboard = await navigator.clipboard.read();
-        for (const item of clipboard) {
-          for (const type of item.types) {
-            if (type.startsWith('image/')) {
-              const blob = await item.getType(type);
-              uploadReference(new File([blob], 'pasted-image.png', { type }));
-              return;
-            }
-          }
-        }
-        addMessage('agent', 'No image found in clipboard.');
-      } catch (err) {
-        addMessage('agent', 'Clipboard access denied. Paste with Ctrl+V or upload a file.');
-      }
-    });
+.diagnostics-output {
+  min-height: 130px;
+}
 
-    document.getElementById('assetUpload').addEventListener('change', (event) => {
-      const file = event.target.files?.[0];
-      if (file) uploadReference(file);
-    });
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  margin-top: 22px;
+}
 
-    document.getElementById('uploadAsset').addEventListener('click', () => {
-      document.getElementById('assetUpload').click();
-    });
+.media-panel textarea {
+  min-height: 116px;
+}
 
-    document.getElementById('chatInput').addEventListener('keydown', (event) => {
-      if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
-        event.preventDefault();
-        sendChat();
-      }
-    });
+.status-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 28px;
+}
 
-    htmlCode.value = defaultHtml;
-    setPreviewHtml(defaultHtml);
-    addMessage('agent', 'Design studio ready. Ask for a landing page, hero section, dashboard, or marketing mockup.');
-  </script>
-</body>
-</html>
+.status-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(14, 22, 34, 0.82);
+  color: var(--text);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.status-pill .dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-right: 8px;
+  display: inline-block;
+  background: var(--success);
+  box-shadow: 0 0 10px rgba(46, 230, 166, 0.75);
+}
+
+.status-pill.warning {
+  color: #ffd77d;
+  background: rgba(246, 200, 95, 0.05);
+  border-color: rgba(246, 200, 95, 0.18);
+}
+
+.status-pill.warning .dot {
+  background: var(--warning);
+  box-shadow: 0 0 10px rgba(246, 200, 95, 0.7);
+}
+
+.status-pill.error {
+  color: #ff9c9c;
+  background: rgba(239, 90, 90, 0.04);
+  border-color: rgba(239, 90, 90, 0.15);
+}
+
+.status-pill.error .dot {
+  background: var(--alert);
+  box-shadow: 0 0 10px rgba(239, 90, 90, 0.75);
+}
+
+@media (max-width: 980px) {
+  .cards-grid,
+  .media-grid,
+  .status-row {
+    grid-template-columns: 1fr;
+  }
+
+  body {
+    padding: 18px 18px 28px;
+  }
+}

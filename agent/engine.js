@@ -1,4 +1,7 @@
 import axios from "axios";
+import fs from "fs";
+import path from "path";
+import { spawnSync } from "child_process";
 import { logError, logInfo } from "../utils/logger.js";
 import { categorizeError } from "../utils/errors.js";
 
@@ -25,7 +28,6 @@ export class Engine {
 
       this.failCount = 0;
       return result;
-
     } catch (err) {
       const msg = err?.message || String(err);
       const category = categorizeError(msg);
@@ -43,7 +45,6 @@ export class Engine {
   }
 
   async sendLocal(prompt, attachments = {}) {
-    // Prefer going through the app proxy so model traffic stays local to the app
     const proxyURL = process.env.PROXY_INTERNAL_URL || "http://localhost:3000/proxy/generate";
     const target = process.env.USE_PROXY_INTERNAL === "true" ? proxyURL : this.localURL;
 
@@ -57,7 +58,6 @@ export class Engine {
 
     const res = await axios.post(target, payload, { timeout: 120000 });
 
-    // Support several response shapes: { response: '...' } or raw model data
     if (res?.data && typeof res.data === "object") {
       if (res.data.response) return { text: res.data.response };
       if (res.data.result) return { text: res.data.result };
@@ -81,6 +81,90 @@ export class Engine {
     );
 
     return res.data;
+  }
+
+  async generateLocalAudio({ prompt, lyrics = "", duration_sec = 30, output_path } = {}) {
+    const safePrompt = typeof prompt === "string" ? prompt.trim() : "";
+    if (!safePrompt) {
+      throw new Error("Music prompt is required");
+    }
+
+    const scriptPath = path.resolve(process.cwd(), "local_audio_engine.py");
+    const pythonBin = process.platform === "win32" ? "python" : process.env.PYTHON_BIN || "python3";
+
+    const modelCandidates = [
+      process.env.ACE_STEP_MODEL_DIR,
+      "C:\\mymlo\\ACE-Step-1.5",
+      "C:\\mymlo\\models\\ace-step-1.5",
+      path.resolve(process.cwd(), "ACE-Step-1.5"),
+      path.resolve(process.cwd(), "models", "ace-step-1.5"),
+    ].filter(Boolean);
+
+    const resolvedModel = modelCandidates.find((candidate) => {
+      try {
+        return fs.existsSync(candidate);
+      } catch {
+        return false;
+      }
+    });
+
+    const args = [
+      scriptPath,
+      "--prompt",
+      safePrompt,
+      "--lyrics",
+      String(lyrics || ""),
+      "--duration",
+      String(duration_sec),
+    ];
+
+    if (output_path) args.push("--output_path", output_path);
+    if (resolvedModel) args.push("--model_dir", resolvedModel);
+
+    const child = spawnSync(pythonBin, args, {
+      cwd: process.cwd(),
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        PYTHONUNBUFFERED: "1"
+      }
+    });
+
+    if (child.error) {
+      throw child.error;
+    }
+
+    const stdout = child.stdout ? child.stdout.trim() : "";
+    const stderr = child.stderr ? child.stderr.trim() : "";
+
+    if (child.status !== 0) {
+      throw new Error(stderr || stdout || "Audio engine failed");
+    }
+
+    const parsedJSON = stdout
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .reverse()
+      .find((line) => {
+        try {
+          JSON.parse(line);
+          return true;
+        } catch {
+          return false;
+        }
+      });
+
+    if (!parsedJSON) {
+      throw new Error(stderr || stdout || "Audio engine returned no JSON payload");
+    }
+
+    const parsed = JSON.parse(parsedJSON);
+    if (parsed?.status === "error") {
+      throw new Error(parsed.error || "Audio engine error");
+    }
+
+    return parsed;
   }
 
   recover() {

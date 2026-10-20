@@ -116,17 +116,20 @@ export async function startServer({ router, port } = {}) {
 
   app.post("/music", async (req, res) => {
     try {
-      const { prompt } = req.body || {};
+      const { prompt, lyrics = "", duration_sec = 30, output_path } = req.body || {};
       if (!prompt) {
         return res.status(400).json({ error: "Missing prompt" });
       }
 
-      res.json({
-        ok: true,
+      const result = await router.handle({
+        type: "music",
         prompt,
-        status: "ready_for_suno_integration",
-        text: `Music generation request accepted for: "${prompt}". Connect your Suno or local audio model here.`
+        lyrics,
+        duration_sec,
+        output_path
       });
+
+      res.json(result);
     } catch (err) {
       logError("API.music", err?.message || String(err));
       res.json({ error: "Music generation failed", details: err?.message });
@@ -140,12 +143,8 @@ export async function startServer({ router, port } = {}) {
         return res.status(400).json({ error: "Missing prompt" });
       }
 
-      res.json({
-        ok: true,
-        prompt,
-        status: "ready_for_frame_pipeline",
-        text: `Video generation request accepted for: "${prompt}". Wire in your frame-by-frame generation service here.`
-      });
+      const result = await router.handle({ type: "video", prompt });
+      res.json(result);
     } catch (err) {
       logError("API.video", err?.message || String(err));
       res.json({ error: "Video generation failed", details: err?.message });

@@ -6,8 +6,8 @@ hands free operation. talk to text text to speech
 all available permissions across my PC and web
 sandbox
 MCP compatable
-link to github, docker,, railway.
-
+link to github, docker, local files.
+Its an assistant for a digital design firm that is capable of coding, image gen, videos through frame by frame generation, and music gen and assistance. it has access to three models. qwen2.5-coder, lavvaphi3:38, and ACE-Step1.5. this is my personal assistant, but i plan on packaging part of it as a platform for profit..that will kick suno and others in the dick. 
 
 
 

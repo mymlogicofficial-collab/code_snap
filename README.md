@@ -12,7 +12,7 @@ Its an assistant for a digital design firm that is capable of coding, image gen,
 
 
 code_snap/
-├── .env
+├── .env.example
 ├── .env.template
 ├── .gitignore
 ├── Dockerfile
@@ -29,7 +29,7 @@ code_snap/
 │   ├── core.js
 │   ├── engine.js
 │   ├── environment.js
-│   ├── mcp.js
+│   ├── mcp.js [x] scaffolded MCP registry; needs production tools
 │   ├── memory.js
 │   ├── plugins.js
 │   ├── router.js
@@ -46,7 +46,7 @@ code_snap/
 ├── server/
 │   ├── api.js
 │   ├── api_inserts.js
-│   ├── permissions.js
+│   ├── permissions.js [x] runtime permission allowlist scaffold only
 │   ├── proxy.js
 │   └── router.js
 ├── ui/
@@ -54,8 +54,8 @@ code_snap/
 │   ├── debug.html
 │   ├── debug.js
 │   ├── index.html
-│   ├── marketplace.html
-│   ├── marketplace.js
+│   ├── marketplace.html [x] starter shell only
+│   ├── marketplace.js [x] starter shell only
 │   └── style.css
 ├── utils/
 │   ├── errors.js
@@ -64,7 +64,7 @@ code_snap/
 │   └── logger.js
 ├── plugins/
 │   ├── README.md
-│   └── samplePlugin.js
+│   └── samplePlugin.js [x] demo plugin only
 ├── scripts/
 │   ├── start-all.ps1
 │   └── start-all.sh
@@ -75,4 +75,3 @@ code_snap/
 └── .github/
     └── workflows/
         └── (if present in repo)
-

@@ -3,24 +3,33 @@
     "mode": "local",
     "localURL": "http://localhost:11434/api/generate",
     "localModel": "qwen2.5-coder:latest",
-    "secondaryModel": "llava-phi3:3.8",
-    "webURL": "https://api.example.com/v1/chat",
-    "webKey": "YOUR_API_KEY"
+    "secondaryModel": "llava-phi3:3.8b",
+    "webURL": "",
+    "webKey": ""
   },
   "agent": {
     "allowEnvironmentChanges": true,
-    "skillsPath": "./agent/skills/"
+    "skillsPath": "./agent/skills/",
+    "mcpEnabled": true
+  },
+  "runtime": {
+    "host": "localhost",
+    "apiPort": 3000,
+    "proxyPort": 3001,
+    "useProxyInternal": true
   },
   "github": {
-    "token": "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",
+    "token": "",
     "owner": "mymlogicofficial-collab",
-    "allowedRepos": ["mymlogicllc-website", "code_snap"]
+    "repo": "code_snap",
+    "allowedRepos": ["mymlogicofficial-collab/code_snap"]
   },
   "files": {
     "allowedPaths": [
-      "C:\\mymlo\\projects\\design-studio",
-      "C:\\mymlo\\projects\\code_snap",
-      "C:\\mymlo\\projects\\website"
+      "./",
+      "C:/mymlo/projects/design-studio",
+      "C:/mymlo/projects/code_snap",
+      "C:/mymlo/projects/website"
     ],
     "maxFileSize": 10485760
   },

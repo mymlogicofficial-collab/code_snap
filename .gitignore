@@ -4,9 +4,5 @@ logs/
 .cache/
 node_modules/
 dist/
-.DS_Store
-# local overrides
-.env.local
-# IntelliJ / VSCode
 .vscode/
 .idea/

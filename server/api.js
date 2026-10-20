@@ -14,7 +14,6 @@ export async function startServer({ router, port } = {}) {
   app.use(express.json({ limit: "50mb" }));
   app.use(fileUpload());
 
-  // Serve UI static files (index.html / debug.html)
   const uiDir = path.join(__dirname, "../ui");
   if (fs.existsSync(uiDir)) {
     app.use(express.static(uiDir));
@@ -22,6 +21,10 @@ export async function startServer({ router, port } = {}) {
   }
 
   logInfo("Server", "API server starting...");
+
+  app.get("/health", (req, res) => {
+    res.json({ ok: true, status: "ready" });
+  });
 
   app.post("/chat", async (req, res) => {
     try {
@@ -39,10 +42,7 @@ export async function startServer({ router, port } = {}) {
   app.post("/upload", async (req, res) => {
     try {
       const file = req.files?.file;
-      const result = await router.handle({
-        type: "file",
-        file
-      });
+      const result = await router.handle({ type: "file", file });
       res.json(result);
     } catch (err) {
       logError("API.upload", err?.message || String(err));
@@ -53,10 +53,7 @@ export async function startServer({ router, port } = {}) {
   app.post("/image", async (req, res) => {
     try {
       const file = req.files?.image;
-      const result = await router.handle({
-        type: "image",
-        file
-      });
+      const result = await router.handle({ type: "image", file });
       res.json(result);
     } catch (err) {
       logError("API.image", err?.message || String(err));
@@ -64,13 +61,30 @@ export async function startServer({ router, port } = {}) {
     }
   });
 
+  app.post("/image/generate", async (req, res) => {
+    try {
+      const { prompt } = req.body || {};
+      if (!prompt) {
+        return res.status(400).json({ error: "Missing prompt" });
+      }
+
+      const result = {
+        ok: true,
+        prompt,
+        text: `Image generation ready for prompt: "${prompt}". Connect your image model to this endpoint to render local or web-generated assets.`,
+        mode: "ready"
+      };
+      res.json(result);
+    } catch (err) {
+      logError("API.image.generate", err?.message || String(err));
+      res.json({ error: "Image generation failed", details: err?.message });
+    }
+  });
+
   app.post("/voice", async (req, res) => {
     try {
       const audio = req.files?.audio;
-      const result = await router.handle({
-        type: "voice",
-        audio
-      });
+      const result = await router.handle({ type: "voice", audio });
       res.json(result);
     } catch (err) {
       logError("API.voice", err?.message || String(err));
@@ -81,11 +95,7 @@ export async function startServer({ router, port } = {}) {
   app.post("/autoskill", async (req, res) => {
     try {
       const { skillName, description } = req.body;
-      const result = await router.handle({
-        type: "autoskill",
-        skillName,
-        description
-      });
+      const result = await router.handle({ type: "autoskill", skillName, description });
       res.json(result);
     } catch (err) {
       logError("API.autoskill", err?.message || String(err));
@@ -96,10 +106,7 @@ export async function startServer({ router, port } = {}) {
   app.post("/execute", async (req, res) => {
     try {
       const { code } = req.body;
-      const result = await router.handle({
-        type: "execute",
-        code
-      });
+      const result = await router.handle({ type: "execute", code });
       res.json(result);
     } catch (err) {
       logError("API.execute", err?.message || String(err));
@@ -107,7 +114,44 @@ export async function startServer({ router, port } = {}) {
     }
   });
 
-  // Proxy endpoint to forward to local model (Ollama)
+  app.post("/music", async (req, res) => {
+    try {
+      const { prompt } = req.body || {};
+      if (!prompt) {
+        return res.status(400).json({ error: "Missing prompt" });
+      }
+
+      res.json({
+        ok: true,
+        prompt,
+        status: "ready_for_suno_integration",
+        text: `Music generation request accepted for: "${prompt}". Connect your Suno or local audio model here.`
+      });
+    } catch (err) {
+      logError("API.music", err?.message || String(err));
+      res.json({ error: "Music generation failed", details: err?.message });
+    }
+  });
+
+  app.post("/video", async (req, res) => {
+    try {
+      const { prompt } = req.body || {};
+      if (!prompt) {
+        return res.status(400).json({ error: "Missing prompt" });
+      }
+
+      res.json({
+        ok: true,
+        prompt,
+        status: "ready_for_frame_pipeline",
+        text: `Video generation request accepted for: "${prompt}". Wire in your frame-by-frame generation service here.`
+      });
+    } catch (err) {
+      logError("API.video", err?.message || String(err));
+      res.json({ error: "Video generation failed", details: err?.message });
+    }
+  });
+
   app.post("/proxy/generate", async (req, res) => {
     try {
       const config = JSON.parse(fs.readFileSync("./config.json", "utf8"));
@@ -143,7 +187,6 @@ export async function startServer({ router, port } = {}) {
     }
   });
 
-  // Status endpoint for UI (checks whether GitHub integration keys are set)
   app.get("/status", (req, res) => {
     try {
       const cfg = JSON.parse(fs.readFileSync("./config.json", "utf8"));

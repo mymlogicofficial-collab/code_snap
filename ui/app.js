@@ -195,14 +195,6 @@ document.getElementById('viewLogs').addEventListener('click', viewLogs);
 document.getElementById('generateMusic').addEventListener('click', generateMusic);
 document.getElementById('generateVideo').addEventListener('click', generateVideo);
 
-document.getElementById('previewMusic').addEventListener('click', () => {
-  setOutput(chatOutput, 'Music preview is wired and ready for a Suno/voice model integration.', 'neutral');
-});
-
-document.getElementById('previewVideo').addEventListener('click', () => {
-  setOutput(chatOutput, 'Video storyboard is ready for a frame-by-frame generation pipeline.', 'neutral');
-});
-
 chatInput.addEventListener('keydown', (event) => {
   if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
     sendChat();

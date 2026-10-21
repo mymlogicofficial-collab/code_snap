@@ -76,6 +76,30 @@ export async function startServer({ router, port } = {}) {
     }
   });
 
+  // Music Generation Handler (Matched to frontend /music fetch call)
+  app.post("/music", async (req, res) => {
+    try {
+      const { prompt } = req.body || {};
+      const result = await router.handle({ type: "music", prompt });
+      res.json(result);
+    } catch (err) {
+      logError("API.music", err?.message || String(err));
+      res.status(500).json({ ok: false, error: "Music handler failed", details: err?.message });
+    }
+  });
+
+  // Video Generation Handler (Matched to frontend /video fetch call)
+  app.post("/video", async (req, res) => {
+    try {
+      const { prompt } = req.body || {};
+      const result = await router.handle({ type: "video", prompt });
+      res.json(result);
+    } catch (err) {
+      logError("API.video", err?.message || String(err));
+      res.status(500).json({ ok: false, error: "Video handler failed", details: err?.message });
+    }
+  });
+
   // System Status & GitHub Sync Check (Checks .env and config.json)
   app.get("/status", (req, res) => {
     try {

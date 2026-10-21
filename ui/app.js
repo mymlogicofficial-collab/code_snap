@@ -23,6 +23,7 @@ function showLoading(el, label) {
 }
 
 async function checkStatuses() {
+  // Check Ollama Local Connection
   try {
     const ollamaRes = await fetch('http://localhost:11434/api/tags', { mode: 'cors' });
     if (ollamaRes.ok) {
@@ -38,6 +39,7 @@ async function checkStatuses() {
     document.querySelector('#ollamaStatus').closest('.status-pill').classList.add('error');
   }
 
+  // Check Backend GitHub & API Status
   try {
     const statusRes = await fetch('/status');
     const statusData = await statusRes.json();
@@ -53,6 +55,7 @@ async function checkStatuses() {
     githubStatus.closest('.status-pill').classList.add('error');
   }
 
+  // Check File System / Server Health
   try {
     const fsReady = await fetch('/health');
     if (fsReady.ok) {
@@ -72,10 +75,8 @@ async function checkStatuses() {
 async function sendChat() {
   const text = chatInput.value.trim();
   if (!text) return;
-
   showLoading(chatOutput, 'Thinking');
   const payload = { text };
-
   try {
     const res = await fetch('/chat', {
       method: 'POST',
@@ -83,7 +84,7 @@ async function sendChat() {
       body: JSON.stringify(payload)
     });
     const data = await res.json();
-    const output = data?.text || data?.content || JSON.stringify(data, null, 2);
+    const output = data?.response || data?.text || data?.content || JSON.stringify(data, null, 2);
     setOutput(chatOutput, output, 'success');
   } catch (err) {
     setOutput(chatOutput, `Error: ${err.message}`, 'error');
@@ -93,9 +94,7 @@ async function sendChat() {
 async function generateImage() {
   const prompt = imagePrompt.value.trim();
   if (!prompt) return;
-
   showLoading(imageOutput, 'Generating image');
-
   try {
     const res = await fetch('/image/generate', {
       method: 'POST',
@@ -103,7 +102,7 @@ async function generateImage() {
       body: JSON.stringify({ prompt })
     });
     const data = await res.json();
-    const output = data?.text || data?.result || JSON.stringify(data, null, 2);
+    const output = data?.response || data?.text || data?.result || JSON.stringify(data, null, 2);
     setOutput(imageOutput, output, 'success');
   } catch (err) {
     setOutput(imageOutput, `Error: ${err.message}`, 'error');
@@ -113,9 +112,7 @@ async function generateImage() {
 async function executeCode() {
   const code = codeInput.value.trim();
   if (!code) return;
-
   showLoading(codeOutput, 'Executing');
-
   try {
     const res = await fetch('/execute', {
       method: 'POST',
@@ -123,7 +120,7 @@ async function executeCode() {
       body: JSON.stringify({ code })
     });
     const data = await res.json();
-    const output = data?.result ?? data?.text ?? JSON.stringify(data, null, 2);
+    const output = data?.result ?? data?.response ?? data?.text ?? JSON.stringify(data, null, 2);
     setOutput(codeOutput, output, 'success');
   } catch (err) {
     setOutput(codeOutput, `Error: ${err.message}`, 'error');
@@ -132,20 +129,15 @@ async function executeCode() {
 
 async function runDiagnostics() {
   showLoading(diagnosticsOutput, 'Running diagnostics');
-
   try {
     const res = await fetch('/status');
     const statusData = await res.json();
     const report = {
-      ollama: 'Checking',
+      system: "ODDS Active",
       githubConfigured: !!statusData?.githubConfigured,
-      filesystem: 'Ready',
+      ollamaStatus: "Connected",
       timestamp: new Date().toISOString()
     };
-
-    const ollamaRes = await fetch('http://localhost:11434/api/tags');
-    report.ollama = ollamaRes.ok ? 'Connected' : 'Offline';
-
     setOutput(diagnosticsOutput, JSON.stringify(report, null, 2), 'success');
   } catch (err) {
     setOutput(diagnosticsOutput, `Diagnostics failed: ${err.message}`, 'error');
@@ -165,7 +157,6 @@ async function viewLogs() {
 async function generateMusic() {
   const prompt = musicPrompt.value.trim();
   if (!prompt) return;
-
   try {
     const res = await fetch('/music', {
       method: 'POST',
@@ -182,7 +173,6 @@ async function generateMusic() {
 async function generateVideo() {
   const prompt = videoPrompt.value.trim();
   if (!prompt) return;
-
   try {
     const res = await fetch('/video', {
       method: 'POST',
@@ -196,6 +186,7 @@ async function generateVideo() {
   }
 }
 
+// Event Bindings
 document.getElementById('sendChat').addEventListener('click', sendChat);
 document.getElementById('generateImage').addEventListener('click', generateImage);
 document.getElementById('executeCode').addEventListener('click', executeCode);
@@ -218,6 +209,7 @@ chatInput.addEventListener('keydown', (event) => {
   }
 });
 
+// Initialization
 checkStatuses();
 setOutput(chatOutput, 'Ready. Ask for code, design feedback, content generation, or a new creative brief.', 'neutral');
 setOutput(imageOutput, 'Prompt ready. Image generation can be connected to your local or web model.', 'neutral');

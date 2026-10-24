@@ -76,6 +76,25 @@ export async function startServer({ router, port } = {}) {
     }
   });
 
+  // Diagnostics Handler
+app.post("/diagnostics", async (req, res) => {
+  try {
+    const result = await router.handle({
+      type: "diagnostics"
+    });
+
+    res.json(result);
+  } catch (err) {
+    logError("API.diagnostics", err?.message || String(err));
+
+    res.status(500).json({
+      ok: false,
+      error: "Diagnostics failed",
+      details: err?.message
+    });
+  }
+});
+
   // Music Generation Handler (Matched to frontend /music fetch call)
   app.post("/music", async (req, res) => {
     try {

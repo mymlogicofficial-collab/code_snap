@@ -131,7 +131,60 @@ if (logsButton) {
   logsButton.addEventListener('click', viewLogs);
 }
 
+async function generateMusic() {
+  try {
+    const prompt = document.getElementById('musicPrompt').value.trim();
 
+    const res = await fetch('/music', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ prompt })
+    });
+
+    const data = await res.json();
+
+    document.getElementById('diagnosticsOutput').textContent =
+      JSON.stringify(data, null, 2);
+  } catch (err) {
+    document.getElementById('diagnosticsOutput').textContent =
+      `Music Error: ${err.message}`;
+  }
+}
+
+async function generateVideo() {
+  try {
+    const prompt = document.getElementById('videoPrompt').value.trim();
+
+    const res = await fetch('/video', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ prompt })
+    });
+
+    const data = await res.json();
+
+    document.getElementById('diagnosticsOutput').textContent =
+      JSON.stringify(data, null, 2);
+  } catch (err) {
+    document.getElementById('diagnosticsOutput').textContent =
+      `Video Error: ${err.message}`;
+  }
+}
+
+const musicButton = document.getElementById('generateMusic');
+const videoButton = document.getElementById('generateVideo');
+
+if (musicButton) {
+  musicButton.addEventListener('click', generateMusic);
+}
+
+if (videoButton) {
+  videoButton.addEventListener('click', generateVideo);
+}
 
 // Event Bindings mapped to your exact index.html IDs
 if (sendButton) {

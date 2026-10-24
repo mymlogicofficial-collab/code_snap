@@ -1,6 +1,6 @@
-const chatInput = document.getElementById('input');
-const sendButton = document.getElementById('send');
-const chatOutput = document.getElementById('messages');
+const chatInput = document.getElementById('chatInput');
+const sendButton = document.getElementById('sendChat');
+const chatOutput = document.getElementById('chatOutput');
 
 const ollamaStatus = document.getElementById('ollamaStatus');
 const githubStatus = document.getElementById('githubStatus');
@@ -11,6 +11,12 @@ function appendMessage(sender, text, tone = 'neutral') {
   msgDiv.className = `message ${sender}`;
   msgDiv.dataset.tone = tone;
   msgDiv.textContent = `${sender === 'user' ? 'You' : 'Agent'}: ${text}`;
+
+  if (!chatOutput) {
+    console.error('chatOutput element not found');
+    return;
+  }
+
   chatOutput.appendChild(msgDiv);
   chatOutput.scrollTop = chatOutput.scrollHeight;
 }

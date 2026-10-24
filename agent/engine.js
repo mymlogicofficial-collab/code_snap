@@ -56,6 +56,9 @@ export class Engine {
 
     if (attachments.image) payload.images = [attachments.image];
 
+    console.log("TARGET =", target);
+    console.log("LOCAL URL =", this.localURL);
+
     const res = await axios.post(target, payload, { timeout: 120000 });
 
     if (res?.data && typeof res.data === "object") {

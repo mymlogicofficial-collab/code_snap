@@ -116,6 +116,23 @@ async function viewLogs() {
   }
 }
 
+if (sendButton) {
+  sendButton.addEventListener('click', sendChat);
+}
+
+const diagnosticsButton = document.getElementById('runDiagnostics');
+const logsButton = document.getElementById('viewLogs');
+
+if (diagnosticsButton) {
+  diagnosticsButton.addEventListener('click', runDiagnostics);
+}
+
+if (logsButton) {
+  logsButton.addEventListener('click', viewLogs);
+}
+
+
+
 // Event Bindings mapped to your exact index.html IDs
 if (sendButton) {
   sendButton.addEventListener('click', sendChat);

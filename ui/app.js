@@ -76,6 +76,46 @@ async function sendChat() {
   }
 }
 
+async function runDiagnostics() {
+  try {
+    const res = await fetch('/diagnostics', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const data = await res.json();
+
+    const output = document.getElementById('diagnosticsOutput');
+    if (output) {
+      output.textContent = JSON.stringify(data, null, 2);
+    }
+  } catch (err) {
+    const output = document.getElementById('diagnosticsOutput');
+    if (output) {
+      output.textContent = `Diagnostics Error: ${err.message}`;
+    }
+  }
+}
+
+async function viewLogs() {
+  try {
+    const res = await fetch('/logs');
+    const text = await res.text();
+
+    const output = document.getElementById('diagnosticsOutput');
+    if (output) {
+      output.textContent = text;
+    }
+  } catch (err) {
+    const output = document.getElementById('diagnosticsOutput');
+    if (output) {
+      output.textContent = `Log Error: ${err.message}`;
+    }
+  }
+}
+
 // Event Bindings mapped to your exact index.html IDs
 if (sendButton) {
   sendButton.addEventListener('click', sendChat);

@@ -45,7 +45,7 @@ export class Engine {
   }
 
   async sendLocal(prompt, attachments = {}) {
-    const proxyURL = process.env.PROXY_INTERNAL_URL || "http://localhost:3000/proxy/generate";
+    const proxyURL = process.env.PROXY_INTERNAL_URL || "http://localhost:3000/api/generate";
     const target = process.env.USE_PROXY_INTERNAL === "true" ? proxyURL : this.localURL;
 
     const payload = {

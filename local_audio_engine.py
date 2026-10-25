@@ -83,6 +83,7 @@ class LocalAudioEngine:
                 device="cpu",
                 torch_dtype=torch.float32,
                 local_files_only=True,
+                trust_remote_code=True,  # Added to support custom model architecture
             )
             print("[ENGINE] Local transformers pipeline loaded on CPU.")
             return
@@ -90,6 +91,7 @@ class LocalAudioEngine:
             print(f"[ENGINE] transformers pipeline load failed: {exc}")
 
         for candidate in [
+            self.model_dir / "cli.py",
             self.model_dir / "run.py",
             self.model_dir / "inference.py",
             self.model_dir / "generate.py",

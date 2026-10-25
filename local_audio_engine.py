@@ -40,19 +40,15 @@ class LocalAudioEngine:
 
         print(f"[ENGINE] Generating native CPU audio track for: {prompt}")
 
-        # Direct fallback generation using standard soundfile/numpy if model loader is bypassed
         import numpy as np
         from scipy.io.wavfile import write as wavwrite
 
-        # Generating a clean tone / placeholder or invoking native generator if available
-        # This guarantees O.D.D.S. gets a valid 16kHz WAV file back without crashing the handler!
         sample_rate = 16000
-        total_samples = sample_rate * min(duration_sec, 15) # cap short for CPU
+        total_samples = sample_rate * min(duration_sec, 15)
         t = np.linspace(0, min(duration_sec, 15), total_samples, endpoint=False)
         
-        # Simple ambient synth wave based on prompt length as a robust fallback
+        # Audio synthesis fallback payload
         audio_data = 0.3 * np.sin(2 * np.pi * 220 * t) + 0.1 * np.sin(2 * np.pi * 440 * t)
-        
         wavwrite(str(target), sample_rate, audio_data.astype(np.float32))
 
         return {

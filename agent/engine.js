@@ -59,7 +59,7 @@ export class Engine {
     console.log("TARGET =", target);
     console.log("LOCAL URL =", this.localURL);
 
-    const res = await axios.post(target, payload, { timeout: 120000 });
+    const res = await axios.post(target, payload, { timeout: 300000 });
 
     if (res?.data && typeof res.data === "object") {
       if (res.data.response) return { text: res.data.response };

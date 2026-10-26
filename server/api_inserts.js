@@ -7,7 +7,7 @@
       const axiosRes = await axios.post(target, req.body, {
         headers: { ...req.headers, host: new URL(target).host },
         responseType: "stream",
-        timeout: 120000
+        timeout: 300000
       });
 
       res.status(axiosRes.status);

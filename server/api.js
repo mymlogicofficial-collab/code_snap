@@ -4,6 +4,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
+import { exec } from "child_process";
 import { logError, logInfo } from "../utils/logger.js";
 import axios from "axios";
 
@@ -12,6 +13,7 @@ dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const PROJECT_ROOT = path.resolve(__dirname, "..");
 
 export async function startServer({ router, port } = {}) {
   const app = express();
@@ -64,7 +66,7 @@ export async function startServer({ router, port } = {}) {
     }
   });
 
-  // Code Execution Handler
+  // Code Execution Handler (Router fallback)
   app.post("/execute", async (req, res) => {
     try {
       const { code } = req.body;
@@ -76,24 +78,57 @@ export async function startServer({ router, port } = {}) {
     }
   });
 
+  // Direct Shell Command Execution Kernel (Executes commands on host machine)
+  app.post("/api/execute-command", async (req, res) => {
+    const { command } = req.body;
+    if (!command) {
+      return res.status(400).json({ ok: false, error: "Missing command to execute" });
+    }
+
+    logInfo("API.ExecuteCommand", `Running shell command: ${command}`);
+    exec(command, { cwd: PROJECT_ROOT }, (error, stdout, stderr) => {
+      if (error) {
+        logError("API.ExecuteCommand", error.message);
+        return res.json({ ok: false, error: error.message, stderr, stdout });
+      }
+      res.json({ ok: true, stdout, stderr });
+    });
+  });
+
+  // Direct File Writer Endpoint
+  app.post("/api/write-file", async (req, res) => {
+    const { filePath, content } = req.body;
+    if (!filePath || content === undefined) {
+      return res.status(400).json({ ok: false, error: "Missing filePath or content" });
+    }
+
+    try {
+      const absolutePath = path.resolve(PROJECT_ROOT, filePath);
+      fs.writeFileSync(absolutePath, content, "utf8");
+      logInfo("API.writeFile", `Successfully wrote to ${absolutePath}`);
+      res.json({ ok: true, path: absolutePath });
+    } catch (err) {
+      logError("API.writeFile", err?.message || String(err));
+      res.status(500).json({ ok: false, error: err?.message });
+    }
+  });
+
   // Diagnostics Handler
-app.post("/diagnostics", async (req, res) => {
-  try {
-    const result = await router.handle({
-      type: "diagnostics"
-    });
-
-    res.json(result);
-  } catch (err) {
-    logError("API.diagnostics", err?.message || String(err));
-
-    res.status(500).json({
-      ok: false,
-      error: "Diagnostics failed",
-      details: err?.message
-    });
-  }
-});
+  app.post("/diagnostics", async (req, res) => {
+    try {
+      const result = await router.handle({
+        type: "diagnostics"
+      });
+      res.json(result);
+    } catch (err) {
+      logError("API.diagnostics", err?.message || String(err));
+      res.status(500).json({
+        ok: false,
+        error: "Diagnostics failed",
+        details: err?.message
+      });
+    }
+  });
 
   // Music Generation Handler (Matched to frontend /music fetch call)
   app.post("/music", async (req, res) => {
@@ -127,7 +162,6 @@ app.post("/diagnostics", async (req, res) => {
         cfg = JSON.parse(fs.readFileSync("./config.json", "utf8"));
       }
 
-      // Check environment variables from .env as well as config.json
       const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || cfg?.github?.token;
       const githubConfigured = !!(token && token.trim() !== "");
 

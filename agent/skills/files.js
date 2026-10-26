@@ -3,7 +3,7 @@ import path from "path";
 
 export async function run(core, input) {
   try {
-    const operation = input.operation;
+    const operation = input.operation || "summarize";
 
     switch (operation) {
       case "create": {
@@ -13,20 +13,9 @@ export async function run(core, input) {
 
         return {
           ok: true,
-          action: "create",
+          operation: "create",
           path: targetPath,
           size: fs.statSync(targetPath).size
-        };
-      }
-
-      case "read": {
-        const targetPath = path.resolve(process.cwd(), input.path);
-
-        return {
-          ok: true,
-          action: "read",
-          path: targetPath,
-          content: fs.readFileSync(targetPath, "utf8")
         };
       }
 
@@ -35,17 +24,35 @@ export async function run(core, input) {
 
         return {
           ok: true,
-          action: "exists",
+          operation: "exists",
           path: targetPath,
           exists: fs.existsSync(targetPath)
         };
       }
 
-      default:
+      case "read": {
+        const targetPath = path.resolve(process.cwd(), input.path);
+
         return {
-          ok: false,
-          error: `Unknown file operation: ${operation}`
+          ok: true,
+          operation: "read",
+          path: targetPath,
+          content: fs.readFileSync(targetPath, "utf8")
         };
+      }
+
+      default: {
+        const file = input.file;
+
+        const summaryPrompt = `
+You are a coding agent. Summarize this file and identify useful code patterns.
+Filename: ${file.name}
+Content:
+${file.data.toString()}
+`;
+
+        return core.think(summaryPrompt);
+      }
     }
   } catch (err) {
     return {

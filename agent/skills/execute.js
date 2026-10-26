@@ -14,7 +14,7 @@ export async function run(core, input) {
   const context = vm.createContext(sandbox);
 
   try {
-    vm.runInContext(code, context, { timeout: 1000 });
+    vm.runInContext(code, context, { timeout: 10000 });
     return {
       text: "Sandbox execution complete.",
       result: sandbox.result

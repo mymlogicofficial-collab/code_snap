@@ -6,16 +6,15 @@ import * as SystemSkill from "./skills/system.js";
 import * as AutoSkill from "./skills/autoskill.js";
 import * as DiagnosticsSkill from "./skills/diagnostics.js";
 import * as ExecuteSkill from "./skills/execute.js";
+import * as MusicSkill from "./skills/music.js";
+import * as VideoSkill from "./skills/video.js";
 
-// === Ollama Models ===
 const CODER_MODEL = "qwen2.5-coder";
 const IMAGE_MODEL = "llava-phi3:3.8b";
 
 export class AgentRouter {
   constructor(core) {
     this.core = core;
-
-    // Attach models to core so skills can use them
     this.core.coderModel = CODER_MODEL;
     this.core.imageModel = IMAGE_MODEL;
   }
@@ -30,6 +29,8 @@ export class AgentRouter {
       case "autoskill":   return AutoSkill.run(this.core, input);
       case "diagnostics": return DiagnosticsSkill.run(this.core, input);
       case "execute":     return ExecuteSkill.run(this.core, input);
+      case "music":       return MusicSkill.run(this.core, input);
+      case "video":       return VideoSkill.run(this.core, input);
       default:            return this.core.think(input.text);
     }
   }

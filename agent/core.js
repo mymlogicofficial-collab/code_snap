@@ -6,12 +6,15 @@ export class AgentCore {
     this.engine = new Engine(config.engine);
     this.environment = new Environment(config.agent);
 
-    // models can be attached by the router at runtime
     this.coderModel = null;
     this.imageModel = null;
   }
 
   async think(prompt, attachments = {}) {
     return this.engine.send(prompt, attachments);
+  }
+
+  async generateMusic(options = {}) {
+    return this.engine.generateLocalAudio(options);
   }
 }

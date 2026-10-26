@@ -2,7 +2,7 @@ import { execSync } from "child_process";
 import path from "path";
 
 export async function run(core, input) {
-  const { prompt, lyrics = "", duration_sec = 30, output_path = "C:\\mymlo\\audio_output\\output.wav" } = input || {};
+  const { prompt = "lo-fi beat", lyrics = "", duration_sec = 30, output_path = "C:\\mymlo\\audio_output\\output.wav" } = input || {};
 
   if (!prompt) {
     return { error: "Missing prompt" };
@@ -10,7 +10,8 @@ export async function run(core, input) {
 
   try {
     console.log(`[MUSIC SKILL] Running local audio engine for: "${prompt}"`);
-    const cmd = `python C:\\mymlo\\projects\\code_snap\\local_audio_engine.py --prompt "${prompt}" --duration ${duration_sec} --output_path "${output_path}"`;
+    // Using --output to match local_audio_engine.py argument parsing
+    const cmd = `python C:\\mymlo\\projects\\code_snap\\local_audio_engine.py --prompt "${prompt}" --duration ${duration_sec} --output "${output_path}"`;
     
     execSync(cmd, { stdio: "inherit" });
 

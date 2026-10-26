@@ -42,9 +42,30 @@ export async function startServer({ router, port } = {}) {
   // Core Chat Handler
   app.post("/chat", async (req, res) => {
     try {
-      const payloadText = req.body.text || req.body.prompt || req.body.message;
-      const result = await router.handle({ type: "text", text: payloadText });
-      res.json(result);
+      const payloadText =
+  req.body.text ||
+  req.body.prompt ||
+  req.body.message;
+
+let request = {
+  type: "text",
+  text: payloadText
+};
+
+if (/create.+file/i.test(payloadText)) {
+  const match =
+    payloadText.match(/(?:named|called)\s+([^\s]+)/i);
+
+  if (match) {
+    request = {
+      type: "code",
+      path: match[1],
+      content: ""
+    };
+  }
+}
+
+const result = await router.handle(request);
     } catch (err) {
       logError("API.chat", err?.message || String(err));
       res.status(500).json({ ok: false, error: "Chat handler failed", details: err?.message });

@@ -7,23 +7,33 @@ export class Environment {
     this.skillsPath = config.skillsPath;
   }
 
-  async addSkill(name, code) {
+  async addSkill(name, code, targetPath = null) {
     if (!this.allowChanges) {
       return { error: "Environment changes disabled" };
     }
 
-    const filePath = path.join(this.skillsPath, `${name}.js`);
-    fs.writeFileSync(filePath, code);
-    return { success: true, filePath };
+    const filePath = targetPath
+      ? path.resolve(process.cwd(), targetPath)
+      : path.join(this.skillsPath, `${name}.js`);
+
+    fs.writeFileSync(filePath, code ?? "", "utf8");
+
+    return {
+      success: true,
+      filePath,
+      exists: fs.existsSync(filePath),
+      size: fs.statSync(filePath).size
+    };
   }
 
-  async modifySkill(name, code) {
+  async modifySkill(name, code, targetPath = null) {
     if (!this.allowChanges) {
       return { error: "Environment changes disabled" };
     }
 
-    const filePath = path.join(this.skillsPath, `${name}.js`);
-    fs.writeFileSync(filePath, code);
-    return { success: true, filePath };
-  }
-}
+    const filePath = targetPath
+      ? path.resolve(process.cwd(), targetPath)
+      : path.join(this.skillsPath, `${name}.js`);
+
+    fs.writeFileSync(filePath, code ?? "", "utf8");
+

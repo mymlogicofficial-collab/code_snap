@@ -37,3 +37,11 @@ export class Environment {
 
     fs.writeFileSync(filePath, code ?? "", "utf8");
 
+    return {
+      success: true,
+      filePath,
+      exists: fs.existsSync(filePath),
+      size: fs.statSync(filePath).size
+    };
+  }
+}

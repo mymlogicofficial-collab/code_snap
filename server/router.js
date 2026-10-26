@@ -37,7 +37,7 @@ export function createRouter() {
             : { model: activeModel, prompt: queryText, stream: false };
 
           try {
-            const response = await axios.post(endpoint, requestBody, { timeout: 60000 });
+            const response = await axios.post(endpoint, requestBody, { timeout: 300000 });
             const responseText = isChatEndpoint
               ? response.data?.message?.content
               : response.data?.response;

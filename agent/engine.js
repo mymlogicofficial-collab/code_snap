@@ -59,15 +59,44 @@ export class Engine {
     console.log("TARGET =", target);
     console.log("LOCAL URL =", this.localURL);
 
-    const res = await axios.post(target, payload, { timeout: 300000 });
+    try {
+      // Attempt Local Generation with a generous timeout
+      const res = await axios.post(target, payload, { timeout: 180000 }); // 3 min local cap
 
-    if (res?.data && typeof res.data === "object") {
-      if (res.data.response) return { text: res.data.response };
-      if (res.data.result) return { text: res.data.result };
-      return { text: JSON.stringify(res.data) };
+      if (res?.data && typeof res.data === "object") {
+        if (res.data.response) return { text: res.data.response };
+        if (res.data.result) return { text: res.data.result };
+        return { text: JSON.stringify(res.data) };
+      }
+
+      return { text: String(res?.data || "") };
+
+    } catch (localError) {
+      console.warn("[Engine] Local generation timed out/failed. Checking OpenRouter fallback...");
+
+      // Fallback to OpenRouter if balance/key is available and local choked on heavy payload
+      if (process.env.OPENROUTER_API_KEY) {
+        try {
+          const openRouterRes = await axios.post("https://openrouter.ai/api/v1/chat/completions", {
+            model: "qwen/qwen-2.5-coder-32b-instruct",
+            messages: [{ role: "user", content: prompt }]
+          }, {
+            headers: {
+              "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+              "HTTP-Referer": "https://thinkmym.com",
+              "X-Title": "ODDS Local Bridge"
+            },
+            timeout: 30000
+          });
+
+          return { text: openRouterRes.data.choices[0].message.content };
+        } catch (routerErr) {
+          throw new Error(`Local failed (${localError.message}) and OpenRouter fallback failed (${routerErr.message})`);
+        }
+      }
+
+      throw localError;
     }
-
-    return { text: String(res?.data || "") };
   }
 
   async sendWeb(prompt, attachments) {

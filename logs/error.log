@@ -22,3 +22,199 @@
 [2026-10-15T00:17:16.716Z] [Server] Listening on port 3000
 [2026-10-15T08:45:57.949Z] [Server] API server starting...
 [2026-10-15T08:45:57.960Z] [Server] Listening on port 3000
+[2026-10-20T15:26:38.838Z] [Engine] Initialized in local mode
+[2026-10-20T15:26:38.841Z] [Server] API server starting...
+[2026-10-21T01:00:47.577Z] [Engine] Initialized in local mode
+[2026-10-21T01:00:47.584Z] [Server] API server starting...
+[2026-10-21T04:48:56.535Z] [Engine] Initialized in local mode
+[2026-10-21T04:48:56.539Z] [Server] API server starting...
+[2026-10-21T07:39:20.392Z] [Engine] Initialized in local mode
+[2026-10-21T07:39:20.398Z] [Server] API server starting...
+[2026-10-21T07:39:47.667Z] [Engine] Initialized in local mode
+[2026-10-21T07:39:47.671Z] [Server] API server starting...
+[2026-10-21T08:02:32.793Z] [Engine] Initialized in local mode
+[2026-10-21T08:02:32.798Z] [Server] API server starting...
+[2026-10-22T07:03:55.430Z] [Engine] Initialized in local mode
+[2026-10-22T07:03:55.440Z] [Server] API server starting...
+[2026-10-24T17:56:00.974Z] [Engine] Initialized in local mode
+[2026-10-24T17:56:00.978Z] [Server] ODDS API server starting up...
+[2026-10-24T17:58:22.525Z] [Engine] Initialized in local mode
+[2026-10-24T17:58:22.528Z] [Server] ODDS API server starting up...
+[2026-10-24T17:58:22.531Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-24T17:58:22.532Z] [Server] ODDS API Server listening on port 3000
+[2026-10-24T18:41:06.728Z] [Engine] Initialized in local mode
+[2026-10-24T18:41:06.732Z] [Server] ODDS API server starting up...
+[2026-10-24T18:41:06.738Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-24T18:41:06.740Z] [Server] ODDS API Server listening on port 3000
+[2026-10-24T18:44:01.506Z] [Engine.GENERAL_ERROR] Request failed with status code 404
+[2026-10-24T18:59:05.678Z] [Engine.GENERAL_ERROR] Request failed with status code 404
+[2026-10-24T19:09:31.464Z] [Engine] Initialized in local mode
+[2026-10-24T19:09:31.468Z] [Server] ODDS API server starting up...
+[2026-10-24T19:09:31.471Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-24T19:09:31.473Z] [Server] ODDS API Server listening on port 3000
+[2026-10-24T19:09:52.489Z] [Engine.GENERAL_ERROR] Request failed with status code 404
+[2026-10-24T19:15:32.758Z] [Engine] Initialized in local mode
+[2026-10-24T19:15:32.763Z] [Server] ODDS API server starting up...
+[2026-10-24T19:15:32.769Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-24T19:15:32.770Z] [Server] ODDS API Server listening on port 3000
+[2026-10-24T19:15:55.813Z] [Engine.GENERAL_ERROR] Request failed with status code 404
+[2026-10-24T19:23:50.095Z] [Engine] Initialized in local mode
+[2026-10-24T19:23:50.103Z] [Server] ODDS API server starting up...
+[2026-10-24T19:23:50.110Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-24T19:23:50.111Z] [Server] ODDS API Server listening on port 3000
+[2026-10-24T19:44:25.142Z] [Engine] Initialized in local mode
+[2026-10-24T19:44:25.148Z] [Server] ODDS API server starting up...
+[2026-10-24T19:44:25.154Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-24T19:44:25.154Z] [Server] ODDS API Server listening on port 3000
+[2026-10-24T19:49:27.082Z] [Engine] Initialized in local mode
+[2026-10-24T19:49:27.086Z] [Server] ODDS API server starting up...
+[2026-10-24T19:49:27.092Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-24T19:49:27.093Z] [Server] ODDS API Server listening on port 3000
+[2026-10-24T19:49:41.610Z] [Diagnostics] Diagnostics run
+[2026-10-24T20:00:07.261Z] [Engine] Initialized in local mode
+[2026-10-24T20:00:07.268Z] [Server] ODDS API server starting up...
+[2026-10-24T20:00:07.272Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-24T20:00:07.279Z] [Server] ODDS API Server listening on port 3000
+[2026-10-24T23:58:18.689Z] [Engine] Initialized in local mode
+[2026-10-24T23:58:18.692Z] [Server] ODDS API server starting up...
+[2026-10-24T23:58:18.695Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-24T23:58:18.697Z] [Server] ODDS API Server listening on port 3000
+[2026-10-25T00:00:44.611Z] [API.music] core.generateMusic is not a function
+[2026-10-25T00:07:31.464Z] [Engine] Initialized in local mode
+[2026-10-25T00:07:31.471Z] [Server] ODDS API server starting up...
+[2026-10-25T00:07:31.477Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-25T00:07:31.478Z] [Server] ODDS API Server listening on port 3000
+[2026-10-25T00:08:21.481Z] [API.music] Traceback (most recent call last):
+  File "C:\mymlo\projects\code_snap\local_audio_engine.py", line 252, in main
+    result = engine.generate(
+             ^^^^^^^^^^^^^^^^
+  File "C:\mymlo\projects\code_snap\local_audio_engine.py", line 226, in generate
+    audio_payload, _ = self._call_model(prompt, lyrics, duration_sec)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\mymlo\projects\code_snap\local_audio_engine.py", line 147, in _call_model
+    raise RuntimeError(
+RuntimeError: ACE-Step 1.5 local inference did not produce audio output. Ensure the model is present in C:\mymlo\ACE-Step-1.5 or C:\mymlo\models\ace-step-1.5.
+[2026-10-25T00:08:26.283Z] [API.music] Traceback (most recent call last):
+  File "C:\mymlo\projects\code_snap\local_audio_engine.py", line 252, in main
+    result = engine.generate(
+             ^^^^^^^^^^^^^^^^
+  File "C:\mymlo\projects\code_snap\local_audio_engine.py", line 226, in generate
+    audio_payload, _ = self._call_model(prompt, lyrics, duration_sec)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\mymlo\projects\code_snap\local_audio_engine.py", line 147, in _call_model
+    raise RuntimeError(
+RuntimeError: ACE-Step 1.5 local inference did not produce audio output. Ensure the model is present in C:\mymlo\ACE-Step-1.5 or C:\mymlo\models\ace-step-1.5.
+[2026-10-25T23:08:52.334Z] [API.music] Skipping import of cpp extensions due to incompatible torch version 2.7.1+cu128 for torchao version 0.16.0             Please see https://github.com/pytorch/ao/issues/2919 for more info
+W1025 16:08:35.250000 13136 site-packages\torch\distributed\elastic\multiprocessing\redirects.py:29] NOTE: Redirects are currently not supported in Windows or MacOs.
+Skipping import of cpp extensions due to incompatible torch version 2.7.1+cu128 for torchao version 0.16.0             Please see https://github.com/pytorch/ao/issues/2919 for more info
+W1025 16:08:45.157000 1640 site-packages\torch\distributed\elastic\multiprocessing\redirects.py:29] NOTE: Redirects are currently not supported in Windows or MacOs.
+2026-10-25 16:08:50.123 | WARNING  | acestep.training.trainer:<module>:40 - bitsandbytes not installed. Using standard AdamW.
+2026-10-25 16:08:50.175 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:646 - \u26a0\ufe0f GPU NOT DETECTED - DIAGNOSTIC INFORMATION
+2026-10-25 16:08:50.175 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:707 - \u2713 PyTorch CUDA build detected
+2026-10-25 16:08:50.176 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:708 -   CUDA version: 12.8
+2026-10-25 16:08:50.176 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:709 - 
+2026-10-25 16:08:50.176 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:710 - \u274c torch.cuda.is_available() returned False
+2026-10-25 16:08:50.176 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:711 - 
+2026-10-25 16:08:50.176 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:712 - Common causes for NVIDIA GPUs:
+2026-10-25 16:08:50.176 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:713 -   1. NVIDIA drivers not installed
+2026-10-25 16:08:50.176 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:714 -   2. CUDA runtime not installed or version mismatch
+2026-10-25 16:08:50.176 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:715 -   3. GPU not supported by installed CUDA version
+2026-10-25 16:08:50.176 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:716 - 
+2026-10-25 16:08:50.176 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:717 - Troubleshooting steps:
+2026-10-25 16:08:50.176 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:718 -   1. Verify NVIDIA driver installation:
+2026-10-25 16:08:50.176 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:719 -      nvidia-smi  # Should list your GPU
+2026-10-25 16:08:50.176 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:720 -   2. Check CUDA version compatibility
+2026-10-25 16:08:50.176 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:721 -   3. Reinstall PyTorch with CUDA support:
+2026-10-25 16:08:50.177 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:722 -      pip install torch --index-url https://download.pytorch.org/whl/cu121
+usage: cli.py [-h] [-c CONFIG] [--configure] [--backend {vllm,pt,mlx}]
+              [--log-level LOG_LEVEL]
+cli.py: error: unrecognized arguments: --prompt hiphop --lyrics  --duration 30 --output C:\mymlo\audio_output\generated_track.wav
+Traceback (most recent call last):
+  File "C:\mymlo\projects\code_snap\local_audio_engine.py", line 254, in main
+    result = engine.generate(
+             ^^^^^^^^^^^^^^^^
+  File "C:\mymlo\projects\code_snap\local_audio_engine.py", line 228, in generate
+    audio_payload, _ = self._call_model(prompt, lyrics, duration_sec)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\mymlo\projects\code_snap\local_audio_engine.py", line 145, in _call_model
+    subprocess.run(cmd, check=True)
+  File "C:\Users\mymlo\AppData\Local\Programs\Python\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['C:\\Users\\mymlo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\mymlo\\ACE-Step-1.5\\cli.py', '--prompt', 'hiphop', '--lyrics', '', '--duration', '30', '--output', 'C:\\mymlo\\audio_output\\generated_track.wav']' returned non-zero exit status 2.
+[2026-10-25T23:09:50.403Z] [API.music] Skipping import of cpp extensions due to incompatible torch version 2.7.1+cu128 for torchao version 0.16.0             Please see https://github.com/pytorch/ao/issues/2919 for more info
+W1025 16:09:35.926000 6280 site-packages\torch\distributed\elastic\multiprocessing\redirects.py:29] NOTE: Redirects are currently not supported in Windows or MacOs.
+Skipping import of cpp extensions due to incompatible torch version 2.7.1+cu128 for torchao version 0.16.0             Please see https://github.com/pytorch/ao/issues/2919 for more info
+W1025 16:09:45.738000 4128 site-packages\torch\distributed\elastic\multiprocessing\redirects.py:29] NOTE: Redirects are currently not supported in Windows or MacOs.
+2026-10-25 16:09:48.345 | WARNING  | acestep.training.trainer:<module>:40 - bitsandbytes not installed. Using standard AdamW.
+2026-10-25 16:09:48.379 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:646 - \u26a0\ufe0f GPU NOT DETECTED - DIAGNOSTIC INFORMATION
+2026-10-25 16:09:48.380 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:707 - \u2713 PyTorch CUDA build detected
+2026-10-25 16:09:48.380 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:708 -   CUDA version: 12.8
+2026-10-25 16:09:48.380 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:709 - 
+2026-10-25 16:09:48.380 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:710 - \u274c torch.cuda.is_available() returned False
+2026-10-25 16:09:48.380 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:711 - 
+2026-10-25 16:09:48.380 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:712 - Common causes for NVIDIA GPUs:
+2026-10-25 16:09:48.380 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:713 -   1. NVIDIA drivers not installed
+2026-10-25 16:09:48.380 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:714 -   2. CUDA runtime not installed or version mismatch
+2026-10-25 16:09:48.380 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:715 -   3. GPU not supported by installed CUDA version
+2026-10-25 16:09:48.380 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:716 - 
+2026-10-25 16:09:48.380 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:717 - Troubleshooting steps:
+2026-10-25 16:09:48.380 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:718 -   1. Verify NVIDIA driver installation:
+2026-10-25 16:09:48.380 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:719 -      nvidia-smi  # Should list your GPU
+2026-10-25 16:09:48.380 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:720 -   2. Check CUDA version compatibility
+2026-10-25 16:09:48.381 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:721 -   3. Reinstall PyTorch with CUDA support:
+2026-10-25 16:09:48.381 | WARNING  | acestep.gpu_config:_log_gpu_diagnostic_info:722 -      pip install torch --index-url https://download.pytorch.org/whl/cu121
+usage: cli.py [-h] [-c CONFIG] [--configure] [--backend {vllm,pt,mlx}]
+              [--log-level LOG_LEVEL]
+cli.py: error: unrecognized arguments: --prompt hiphop --lyrics  --duration 30 --output C:\mymlo\audio_output\generated_track.wav
+Traceback (most recent call last):
+  File "C:\mymlo\projects\code_snap\local_audio_engine.py", line 254, in main
+    result = engine.generate(
+             ^^^^^^^^^^^^^^^^
+  File "C:\mymlo\projects\code_snap\local_audio_engine.py", line 228, in generate
+    audio_payload, _ = self._call_model(prompt, lyrics, duration_sec)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\mymlo\projects\code_snap\local_audio_engine.py", line 145, in _call_model
+    subprocess.run(cmd, check=True)
+  File "C:\Users\mymlo\AppData\Local\Programs\Python\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['C:\\Users\\mymlo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\mymlo\\ACE-Step-1.5\\cli.py', '--prompt', 'hiphop', '--lyrics', '', '--duration', '30', '--output', 'C:\\mymlo\\audio_output\\generated_track.wav']' returned non-zero exit status 2.
+[2026-10-25T23:14:37.923Z] [Engine] Initialized in local mode
+[2026-10-25T23:14:37.930Z] [Server] ODDS API server starting up...
+[2026-10-25T23:14:37.935Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-25T23:14:37.936Z] [Server] ODDS API Server listening on port 3000
+[2026-10-25T23:19:24.450Z] [Engine] Initialized in local mode
+[2026-10-25T23:19:24.453Z] [Server] ODDS API server starting up...
+[2026-10-25T23:19:24.456Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-25T23:19:24.457Z] [Server] ODDS API Server listening on port 3000
+[2026-10-25T23:44:49.095Z] [Engine] Initialized in local mode
+[2026-10-25T23:44:49.100Z] [Server] ODDS API server starting up...
+[2026-10-25T23:44:49.106Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-25T23:44:49.107Z] [Server] ODDS API Server listening on port 3000
+[2026-10-25T23:48:27.017Z] [Engine] Initialized in local mode
+[2026-10-25T23:48:27.022Z] [Server] ODDS API server starting up...
+[2026-10-25T23:48:27.034Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-25T23:48:27.036Z] [Server] ODDS API Server listening on port 3000
+[2026-10-25T23:53:10.298Z] [Engine] Initialized in local mode
+[2026-10-25T23:53:10.303Z] [Server] ODDS API server starting up...
+[2026-10-25T23:53:10.314Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-25T23:53:10.316Z] [Server] ODDS API Server listening on port 3000
+[2026-10-25T23:59:39.684Z] [Engine.NETWORK_ERROR] timeout of 120000ms exceeded
+[2026-10-25T23:59:39.857Z] [Proxy] timeout of 120000ms exceeded
+[2026-10-26T00:10:30.827Z] [Engine.NETWORK_ERROR] timeout of 120000ms exceeded
+[2026-10-26T00:10:31.077Z] [Proxy] timeout of 120000ms exceeded
+[2026-10-26T00:14:44.675Z] [Engine] Initialized in local mode
+[2026-10-26T00:14:44.681Z] [Server] ODDS API server starting up...
+[2026-10-26T00:14:44.687Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-26T00:14:44.688Z] [Server] ODDS API Server listening on port 3000
+[2026-10-26T00:23:06.258Z] [Engine] Initialized in local mode
+[2026-10-26T00:23:06.261Z] [Server] ODDS API server starting up...
+[2026-10-26T00:23:06.264Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-26T00:23:06.265Z] [Server] ODDS API Server listening on port 3000
+[2026-10-26T00:31:37.184Z] [Engine] Initialized in local mode
+[2026-10-26T00:31:37.188Z] [Server] ODDS API server starting up...
+[2026-10-26T00:31:37.191Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-26T00:31:37.192Z] [Server] ODDS API Server listening on port 3000
+[2026-10-26T03:08:21.466Z] [Engine] Initialized in local mode
+[2026-10-26T03:08:21.475Z] [Server] ODDS API server starting up...
+[2026-10-26T03:08:21.481Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-26T03:08:21.482Z] [Server] ODDS API Server listening on port 3000

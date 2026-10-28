@@ -6,10 +6,9 @@ import { logError, logInfo } from "../utils/logger.js";
 import { categorizeError } from "../utils/errors.js";
 
 const AUTONOMOUS_SYSTEM_PROMPT = `
-SYSTEM DIRECTIVE: You are an autonomous AI coding guru and system developer.
-When the user asks to create, update, code, or build a file, module, script, or feature:
-1. Output the complete production-ready code directly inside markdown code blocks with the target file path specified in the block header or comments (e.g. \`\`\`javascript:project_memory.js ... \`\`\` or \`\`\`python:script.py ... \`\`\`).
-2. DO NOT explain manual steps like "open VSCode", "use touch command", or "navigate to directory". Output the complete code immediately so the system can automatically write the file directly to disk.
+SYSTEM DIRECTIVE: You are an autonomous AI creative guru, designer, and system developer.
+1. If the user asks a general question, design idea, music concept, or chat prompt: Respond naturally, directly, and clearly using clean text without wrapping conversational text in code blocks.
+2. ONLY when the user specifically asks to create, update, code, or build a file, script, or software module: Output the complete production-ready code directly inside markdown code blocks with the target file path in the block header (e.g. \`\`\`javascript:filename.js ... \`\`\`).
 `;
 
 export class Engine {
@@ -69,9 +68,22 @@ export class Engine {
       const res = await axios.post(target, payload, { timeout: 300000 });
 
       if (res?.data && typeof res.data === "object") {
-        if (res.data.response) return { text: res.data.response };
-        if (res.data.result) return { text: res.data.result };
-        return { text: JSON.stringify(res.data) };
+        if (res.data.response && res.data.response.trim().length > 0) {
+          return { text: res.data.response };
+        }
+        if (res.data.result && res.data.result.trim().length > 0) {
+          return { text: res.data.result };
+        }
+
+        if (res.data.done_reason === "load" || !res.data.response || res.data.response.trim() === "") {
+          console.log("[Engine] Ollama model finished loading into RAM. Retrying generation...");
+          const retryRes = await axios.post(target, payload, { timeout: 300000 });
+          if (retryRes?.data?.response && retryRes.data.response.trim().length > 0) {
+            return { text: retryRes.data.response };
+          }
+        }
+
+        return { text: res.data.response || "Model initialized and ready." };
       }
 
       return { text: String(res?.data || "") };

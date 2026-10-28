@@ -1,7 +1,6 @@
 import { Engine } from "./engine.js";
 import { Environment } from "./environment.js";
 import { run as runCoderSkill } from "./skills/coder.js";
-import { run as runCodeSkill } from "./skills/code.js";
 
 export class AgentCore {
   constructor(config) {
@@ -13,12 +12,12 @@ export class AgentCore {
   }
 
   async think(prompt, attachments = {}) {
-    // 1. Get raw text/generation response from the engine
+    // 1. Get generation response from local model engine
     const rawOutput = await this.engine.send(prompt, attachments);
     const textContent = typeof rawOutput === "string" ? rawOutput : rawOutput?.text || JSON.stringify(rawOutput);
 
-    // 2. Parse out markdown code blocks with target filenames
-    // Example format: ```js\n// filename: relative/path/to/file.js\n...code...\n```
+    // 2. Extract code block and target filename header
+    // Looks for standard markdown: ```js\n// filename: relative/path/to/file.js\n...code...\n```
     const fileMatch = textContent.match(/```(?:javascript|js|json|html|css)?\s*\n\/\/\s*filename:\s*([^\n]+)\n([\s\S]*?)```/i)
                    || textContent.match(/javascript:([a-zA-Z0-9_./-]+)\n([\s\S]*?)```/i);
 
@@ -26,9 +25,9 @@ export class AgentCore {
       const filePath = fileMatch[1].trim();
       const content = fileMatch[2];
 
-      console.log(`[AgentCore Execution] Extracted file write payload for ${filePath}`);
+      console.log(`[AgentCore] Extracted file payload for ${filePath}. Triggering coder.js...`);
 
-      // 3. Dispatch directly to the coder skill to write disk changes
+      // 3. Directly call coder.js to perform local disk I/O
       const executionResult = await runCoderSkill(this, {
         filePath,
         content,

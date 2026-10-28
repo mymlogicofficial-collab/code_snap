@@ -38,9 +38,8 @@ export class AgentRouter {
         const rawOutput = await this.core.think(input.text || input);
         const textContent = typeof rawOutput === "string" ? rawOutput : rawOutput?.text || "";
 
-        // Extract filename and code blocks from qwen2.5-coder response
-        const fileMatch = textContent.match(/```(?:javascript|js|json|html|css)?\s*\n\/\/\s*filename:\s*([^\n]+)\n([\s\S]*?)```/i)
-                       || textContent.match(/javascript:([a-zA-Z0-9_./-]+)\n([\s\S]*?)```/i);
+        // Extract filename and code blocks (supports Python/JS, code fences, and custom prefixes)
+        const fileMatch = textContent.match(/```(?:javascript|js|json|html|css|python)?\s*\n(?:\/\/|#)\s*(?:filename:)?\s*([^\n]+)\n([\s\S]*?)```/i) || textContent.match(/(?:javascript|python):([a-zA-Z0-9_./-]+)\n([\s\S]*?)```/i);
 
         if (fileMatch) {
           const filePath = fileMatch[1].trim();

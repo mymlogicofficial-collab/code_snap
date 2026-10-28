@@ -3,94 +3,229 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>O.D.D.S. Digital Design Suite</title>
+  <title>O.D.D.S. GURU — One-stop Digital Design Suite</title>
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
   <div class="app-shell">
-    <header class="topbar" aria-label="O.D.D.S. header">
-      <div class="brand-mark" aria-hidden="true">🛠</div>
-      <div class="brand-copy">
-        <h1 class="brand-title">O.D.D.S. Agent</h1>
+    <!-- Top Navigation Bar -->
+    <header class="topbar">
+      <div class="brand-container">
+        <div class="brand-mark">⚡</div>
+        <div class="brand-info">
+          <h1 class="brand-title">O.D.D.S. GURU</h1>
+          <span class="brand-badge">One-stop Digital Design Suite</span>
+        </div>
       </div>
+
+      <!-- Studio Navigation Tabs -->
+      <nav class="studio-tabs" aria-label="Studio navigation">
+        <button class="tab-btn active" data-tab="chatStudio">
+          <span class="tab-icon">💬</span> Creative Workspace
+        </button>
+        <button class="tab-btn" data-tab="musicStudio">
+          <span class="tab-icon">🎵</span> Music & Audio Studio
+        </button>
+        <button class="tab-btn" data-tab="visualStudio">
+          <span class="tab-icon">🎨</span> Brand & Video Studio
+        </button>
+        <button class="tab-btn" data-tab="sandboxStudio">
+          <span class="tab-icon">⚙️</span> Coder Sandbox
+        </button>
+      </nav>
     </header>
 
-    <p class="subhead">Ollamated Design &amp; Development System</p>
+    <!-- Main Workspace Views -->
+    <main class="workspace-main">
 
-    <main class="cards-grid" aria-label="Agent tools">
-      <section class="panel" aria-label="Chat panel">
-        <div class="panel-header">
-          <span class="panel-title"><span class="icon" aria-hidden="true">💬</span> Chat</span>
+      <!-- TAB 1: CREATIVE CHAT WORKSPACE -->
+      <section id="chatStudio" class="tab-content active">
+        <!-- Quick Creative Starter Chips -->
+        <div class="quick-prompts">
+          <button class="prompt-chip" data-prompt="Design a complete brand identity and logo concept for a modern tech startup including color palette and typography rules.">
+            ✨ Brand & Logo Identity
+          </button>
+          <button class="prompt-chip" data-prompt="Architect a clean, scalable mobile and web application system architecture with state management and API design.">
+            📱 System & App Architecture
+          </button>
+          <button class="prompt-chip" data-prompt="Create a 10-second commercial motion storyboard and visual shot list for a high-end product launch.">
+            🎬 Commercial Storyboard
+          </button>
+          <button class="prompt-chip" data-prompt="Write a production-ready, modular code implementation for our application core.">
+            💻 Production Code Module
+          </button>
         </div>
-        <label class="field-label" for="chatInput">Message</label>
-        <textarea id="chatInput" placeholder="Ask me anything..."></textarea>
-        <button id="sendChat" class="primary-button" type="button">Send Message</button>
-        <div id="chatOutput" class="output-panel"></div>
+
+        <!-- Wide Main Conversation Feed -->
+        <div class="chat-container">
+          <div id="chatOutput" class="conversation-feed" aria-live="polite"></div>
+
+          <!-- Attachment Preview Bar -->
+          <div id="attachmentBar" class="attachment-bar hidden"></div>
+
+          <!-- Wide Drag-and-Drop & Copy-Paste Input Box -->
+          <div id="dropZone" class="input-dropzone">
+            <div id="dropOverlay" class="drop-overlay hidden">
+              <span class="drop-icon">📥</span>
+              <span class="drop-text">Drop files, images, or audio here</span>
+            </div>
+
+            <textarea id="chatInput" placeholder="Ask your Digital Design Guru... Drag/drop files, paste images from clipboard, or type prompt (Ctrl+Enter to send)..."></textarea>
+
+            <div class="input-actions">
+              <div class="action-left">
+                <label class="icon-action-btn" title="Attach file or media">
+                  <span>📎 File</span>
+                  <input type="file" id="fileAttachInput" multiple style="display: none;" />
+                </label>
+                <label class="icon-action-btn" title="Attach image">
+                  <span>📷 Image</span>
+                  <input type="file" id="imageAttachInput" accept="image/*" multiple style="display: none;" />
+                </label>
+              </div>
+
+              <div class="action-right">
+                <button id="sendChat" class="primary-button send-btn" type="button">
+                  🚀 Send Message
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <section class="panel" aria-label="Image generator panel">
-        <div class="panel-header">
-          <span class="panel-title"><span class="icon" aria-hidden="true">🖼️</span> Image Generator</span>
+      <!-- TAB 2: MUSIC & AUDIO STUDIO -->
+      <section id="musicStudio" class="tab-content hidden">
+        <div class="studio-grid">
+
+          <div class="studio-card">
+            <div class="card-header">
+              <span class="card-title">🎵 Style & Track Parameters</span>
+            </div>
+
+            <label class="field-label" for="musicStyle">Genre / Style / Key / Tempo</label>
+            <input type="text" id="musicStyle" class="text-input" placeholder="e.g. hiphop 5/8 d#, lo-fi 85bpm c-minor, synthwave 120bpm..." value="hiphop 5/8 d#" />
+
+            <label class="field-label" for="musicPrompt" style="margin-top: 14px;">Music & Track Description</label>
+            <textarea id="musicPrompt" placeholder="Describe the vibe, instrumental layers, beat drop, or arrangement..."></textarea>
+
+            <div class="button-row">
+              <button id="generateMusic" class="primary-button" type="button">🎵 Generate Audio / Master Track</button>
+            </div>
+          </div>
+
+          <div class="studio-card">
+            <div class="card-header">
+              <span class="card-title">📝 Lyrics & Vocal Recording Suite</span>
+            </div>
+
+            <label class="field-label" for="musicLyrics">Lyrics & Spoken Word</label>
+            <textarea id="musicLyrics" placeholder="Enter lyrics for verses, chorus, or voiceover tags..."></textarea>
+
+            <!-- Recording & Audio Upload Section -->
+            <div class="audio-input-suite">
+              <div class="recorder-box">
+                <button id="recordLyricsBtn" class="record-btn" type="button">
+                  <span class="rec-dot"></span> <span id="recBtnText">Record Voice / Lyrics</span>
+                </button>
+                <span id="recordTimer" class="record-timer">00:00</span>
+              </div>
+
+              <div class="upload-box">
+                <label class="secondary-button upload-audio-btn">
+                  📂 Upload Audio / Stems
+                  <input type="file" id="audioFileInput" accept="audio/*" style="display: none;" />
+                </label>
+              </div>
+            </div>
+
+            <!-- Audio Recording / Upload Preview Player -->
+            <div id="audioPreviewContainer" class="audio-preview-container hidden">
+              <span class="preview-label">Audio Reference / Preview:</span>
+              <audio id="audioPreviewPlayer" controls style="width: 100%; margin-top: 6px;"></audio>
+            </div>
+          </div>
+
         </div>
-        <label class="field-label" for="imagePrompt">Prompt</label>
-        <textarea id="imagePrompt" placeholder="Describe the image you want..."></textarea>
-        <button id="generateImage" class="primary-button" type="button">Generate Image</button>
-        <div id="imageOutput" class="output-panel"></div>
+
+        <!-- Music Output Player Panel -->
+        <div class="studio-card output-card">
+          <div class="card-header">
+            <span class="card-title">🎧 Studio Master Output</span>
+          </div>
+          <div id="musicOutput" class="media-output-box">No audio generated yet.</div>
+        </div>
       </section>
 
-      <section class="panel" aria-label="Code execution panel">
-        <div class="panel-header">
-          <span class="panel-title"><span class="icon" aria-hidden="true">⚙️</span> Execute Code</span>
+      <!-- TAB 3: BRAND, VISUAL & VIDEO STUDIO -->
+      <section id="visualStudio" class="tab-content hidden">
+        <div class="studio-grid">
+
+          <div class="studio-card">
+            <div class="card-header">
+              <span class="card-title">🎨 Logo & Visual Asset Studio</span>
+            </div>
+            <label class="field-label" for="imagePrompt">Visual Concept / Logo Prompt</label>
+            <textarea id="imagePrompt" placeholder="Describe branding guidelines, vector logo design, or album artwork..."></textarea>
+            <button id="generateImage" class="primary-button" type="button">🎨 Generate Logo / Visual Asset</button>
+            <div id="imageOutput" class="media-output-box" style="margin-top: 14px;">No visual generated yet.</div>
+          </div>
+
+          <div class="studio-card">
+            <div class="card-header">
+              <span class="card-title">🎬 Commercial & Motion Video Studio</span>
+            </div>
+            <label class="field-label" for="videoPrompt">Commercial Spot / Motion Storyboard Prompt</label>
+            <textarea id="videoPrompt" placeholder="Describe 10-second product reveal, commercial camera angles, or motion graphics..."></textarea>
+            <button id="generateVideo" class="primary-button" type="button">🎬 Render Commercial Video Track</button>
+            <div id="videoOutput" class="media-output-box" style="margin-top: 14px;">No video rendered yet.</div>
+          </div>
+
         </div>
-        <label class="field-label" for="codeInput">JavaScript Code</label>
-        <textarea id="codeInput" placeholder="Enter JavaScript code...">console.log('O.D.D.S. ready');</textarea>
-        <button id="executeCode" class="primary-button" type="button">Execute</button>
-        <div id="codeOutput" class="output-panel"></div>
       </section>
 
-      <section class="panel" aria-label="Diagnostics panel">
-        <div class="panel-header">
-          <span class="panel-title"><span class="icon" aria-hidden="true">🩺</span> Diagnostics</span>
+      <!-- TAB 4: CODER SANDBOX & DIAGNOSTICS -->
+      <section id="sandboxStudio" class="tab-content hidden">
+        <div class="studio-grid">
+
+          <div class="studio-card">
+            <div class="card-header">
+              <span class="card-title">⚙️ Code Execution Sandbox</span>
+            </div>
+            <label class="field-label" for="codeInput">JavaScript Code Engine</label>
+            <textarea id="codeInput" placeholder="Enter code to test...">console.log('O.D.D.S. Code Engine active');</textarea>
+            <button id="executeCode" class="primary-button" type="button">Run Sandbox Code</button>
+            <div id="codeOutput" class="media-output-box" style="margin-top: 14px;"></div>
+          </div>
+
+          <div class="studio-card">
+            <div class="card-header">
+              <span class="card-title">🩺 System Diagnostics & Error Logs</span>
+            </div>
+            <div class="button-row">
+              <button id="runDiagnostics" class="secondary-button" type="button">Run System Diagnostics</button>
+              <button id="viewLogs" class="secondary-button muted-button" type="button">View Error Logs</button>
+            </div>
+            <div id="diagnosticsOutput" class="media-output-box diagnostics-box" style="margin-top: 14px;"></div>
+          </div>
+
         </div>
-        <div class="button-row">
-          <button id="runDiagnostics" class="secondary-button" type="button">Run Diagnostics</button>
-          <button id="viewLogs" class="secondary-button muted-button" type="button">View Error Logs</button>
-        </div>
-        <div id="diagnosticsOutput" class="output-panel diagnostics-output"></div>
       </section>
+
     </main>
 
-    <section class="media-grid" aria-label="Media generation tools">
-      <div class="panel media-panel">
-        <div class="panel-header">
-          <span class="panel-title"><span class="icon" aria-hidden="true">🎵</span> Music / Audio</span>
-        </div>
-        <label class="field-label" for="musicPrompt">Prompt</label>
-        <textarea id="musicPrompt" placeholder="Generate a clean lo-fi instrumental or spoken-word track..."></textarea>
-        <div class="button-row compact-row">
-          <button id="generateMusic" class="primary-button" type="button">Generate Music</button>
-          <button id="previewMusic" class="secondary-button" type="button">Preview</button>
-        </div>
+    <!-- Bottom System Status Bar -->
+    <footer class="status-footer">
+      <div class="status-pill success">
+        <span class="dot"></span> Local LLM Engine: <strong id="ollamaStatus">Checking...</strong>
       </div>
-
-      <div class="panel media-panel">
-        <div class="panel-header">
-          <span class="panel-title"><span class="icon" aria-hidden="true">🎬</span> Video</span>
-        </div>
-        <label class="field-label" for="videoPrompt">Prompt</label>
-        <textarea id="videoPrompt" placeholder="Create a cinematic 10-second product reveal or motion storyboard..."></textarea>
-        <div class="button-row compact-row">
-          <button id="generateVideo" class="primary-button" type="button">Generate Video</button>
-          <button id="previewVideo" class="secondary-button" type="button">Storyboard</button>
-        </div>
+      <div class="status-pill warning">
+        <span class="dot"></span> GitHub Integration: <strong id="githubStatus">Checking...</strong>
       </div>
-    </section>
-
-    <div class="status-row" aria-label="System statuses">
-      <div class="status-pill success"><span class="dot" aria-hidden="true"></span><span id="ollamaStatus">Checking...</span></div>
-      <div class="status-pill warning"><span class="dot" aria-hidden="true"></span><span id="githubStatus">Checking...</span></div>
-      <div class="status-pill success"><span class="dot" aria-hidden="true"></span><span id="filesystemStatus">Checking...</span></div>
-    </div>
+      <div class="status-pill success">
+        <span class="dot"></span> File Engine: <strong id="filesystemStatus">Checking...</strong>
+      </div>
+    </footer>
   </div>
 
   <script src="./app.js"></script>

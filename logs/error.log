@@ -218,3 +218,45 @@ subprocess.CalledProcessError: Command '['C:\\Users\\mymlo\\AppData\\Local\\Prog
 [2026-10-26T03:08:21.475Z] [Server] ODDS API server starting up...
 [2026-10-26T03:08:21.481Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
 [2026-10-26T03:08:21.482Z] [Server] ODDS API Server listening on port 3000
+[2026-10-26T03:29:30.074Z] [Engine] Initialized in local mode
+[2026-10-26T03:29:30.077Z] [Server] ODDS API server starting up...
+[2026-10-26T03:29:30.080Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-26T03:29:30.081Z] [Server] ODDS API Server listening on port 3000
+[2026-10-26T04:33:29.480Z] [Engine] Initialized in local mode
+[2026-10-26T04:33:29.489Z] [Server] ODDS API server starting up...
+[2026-10-26T04:35:02.725Z] [Engine] Initialized in local mode
+[2026-10-26T04:35:02.730Z] [Server] ODDS API server starting up...
+[2026-10-26T04:36:19.816Z] [Engine] Initialized in local mode
+[2026-10-26T04:36:19.820Z] [Server] ODDS API server starting up...
+[2026-10-26T04:40:35.143Z] [Engine] Initialized in local mode
+[2026-10-26T04:40:35.146Z] [Server] ODDS API server starting up...
+[2026-10-26T04:40:35.156Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-26T04:40:35.157Z] [Server] ODDS API Server listening on port 3000
+[2026-10-26T04:48:56.418Z] [API.ExecuteCommand] Running shell command: node -v
+[2026-10-26T04:58:29.786Z] [Engine.NETWORK_ERROR] timeout of 120000ms exceeded
+[2026-10-26T04:58:29.923Z] [Proxy] timeout of 120000ms exceeded
+[2026-10-26T05:04:44.094Z] [Engine.NETWORK_ERROR] timeout of 120000ms exceeded
+[2026-10-26T05:04:44.217Z] [Proxy] timeout of 120000ms exceeded
+[2026-10-26T11:34:47.241Z] [Engine] Initialized in local mode
+[2026-10-26T11:34:47.251Z] [Server] ODDS API server starting up...
+[2026-10-26T11:34:47.255Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-26T11:34:47.256Z] [Server] ODDS API Server listening on port 3000
+[2026-10-26T12:06:00.786Z] [Engine.NETWORK_ERROR] timeout of 300000ms exceeded
+[2026-10-26T12:06:01.295Z] [Proxy] timeout of 300000ms exceeded
+[2026-10-26T12:08:02.458Z] [Diagnostics] Diagnostics run
+[2026-10-26T12:58:09.183Z] [Engine] Initialized in local mode
+[2026-10-26T12:58:09.191Z] [Server] ODDS API server starting up...
+[2026-10-26T12:58:09.197Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-26T12:58:09.198Z] [Server] ODDS API Server listening on port 3000
+[2026-10-26T16:10:52.480Z] [Engine] Initialized in local mode
+[2026-10-26T16:10:52.486Z] [Server] ODDS API server starting up...
+[2026-10-26T16:10:52.499Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-26T16:10:52.501Z] [Server] ODDS API Server listening on port 3000
+[2026-10-26T19:19:24.858Z] [Engine] Initialized in local mode
+[2026-10-26T19:19:24.861Z] [Server] ODDS API server starting up...
+[2026-10-26T19:19:24.866Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-26T19:19:24.869Z] [Server] ODDS API Server listening on port 3000
+[2026-10-27T07:49:15.437Z] [Engine] Initialized in local mode
+[2026-10-27T07:49:15.465Z] [Server] ODDS API server starting up...
+[2026-10-28T18:14:16.518Z] [Engine] Initialized in local mode
+[2026-10-28T18:14:16.526Z] [Server] ODDS API server starting up...

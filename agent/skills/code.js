@@ -6,7 +6,7 @@ export async function run(core, input) {
   const targetPath = input.path ? path.resolve(repoRoot, input.path) : null;
 
   // If the user/agent provided a path and content, write it directly to disk
-  if (targetPath && input.content) {
+  if (targetPath && input.content !== undefined) {
     if (!targetPath.startsWith(repoRoot)) {
       return { error: "INVALID_PATH", details: "Path must be inside the repository root." };
     }
@@ -18,7 +18,7 @@ export async function run(core, input) {
       }
 
       fs.writeFileSync(targetPath, input.content, "utf8");
-      return { ok: true, message: `Successfully wrote file to ${input.path}` };
+      return { ok: true, message: `Successfully wrote file to ${input.path}`, text: `Successfully wrote file to ${input.path}` };
     } catch (err) {
       return { error: "FILE_WRITE_FAILED", details: err.message };
     }

@@ -8,6 +8,10 @@ export async function run(core, input) {
     switch (operation) {
       case "create": {
         const targetPath = path.resolve(process.cwd(), input.path);
+        const dir = path.dirname(targetPath);
+        if (!fs.existsSync(dir)) {
+          fs.mkdirSync(dir, { recursive: true });
+        }
 
         fs.writeFileSync(targetPath, input.content || "", "utf8");
 
@@ -15,7 +19,8 @@ export async function run(core, input) {
           ok: true,
           operation: "create",
           path: targetPath,
-          size: fs.statSync(targetPath).size
+          size: fs.statSync(targetPath).size,
+          text: `Created file ${input.path}`
         };
       }
 

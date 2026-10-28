@@ -5,6 +5,13 @@ import { spawnSync } from "child_process";
 import { logError, logInfo } from "../utils/logger.js";
 import { categorizeError } from "../utils/errors.js";
 
+const AUTONOMOUS_SYSTEM_PROMPT = `
+SYSTEM DIRECTIVE: You are an autonomous AI coding guru and system developer.
+When the user asks to create, update, code, or build a file, module, script, or feature:
+1. Output the complete production-ready code directly inside markdown code blocks with the target file path specified in the block header or comments (e.g. \`\`\`javascript:project_memory.js ... \`\`\` or \`\`\`python:script.py ... \`\`\`).
+2. DO NOT explain manual steps like "open VSCode", "use touch command", or "navigate to directory". Output the complete code immediately so the system can automatically write the file directly to disk.
+`;
+
 export class Engine {
   constructor(config) {
     this.mode = config.mode;
@@ -48,20 +55,18 @@ export class Engine {
     const proxyURL = process.env.PROXY_INTERNAL_URL || "http://localhost:3001/api/generate";
     const target = process.env.USE_PROXY_INTERNAL === "true" ? proxyURL : this.localURL;
 
+    const fullPrompt = `${AUTONOMOUS_SYSTEM_PROMPT}\nUSER REQUEST: ${prompt}`;
+
     const payload = {
       model: attachments.model || this.localModel,
-      prompt,
+      prompt: fullPrompt,
       stream: false
     };
 
     if (attachments.image) payload.images = [attachments.image];
 
-    console.log("TARGET =", target);
-    console.log("LOCAL URL =", this.localURL);
-
     try {
-      // Attempt Local Generation with a generous timeout
-      const res = await axios.post(target, payload, { timeout: 180000 }); // 3 min local cap
+      const res = await axios.post(target, payload, { timeout: 300000 });
 
       if (res?.data && typeof res.data === "object") {
         if (res.data.response) return { text: res.data.response };
@@ -74,19 +79,21 @@ export class Engine {
     } catch (localError) {
       console.warn("[Engine] Local generation timed out/failed. Checking OpenRouter fallback...");
 
-      // Fallback to OpenRouter if balance/key is available and local choked on heavy payload
       if (process.env.OPENROUTER_API_KEY) {
         try {
           const openRouterRes = await axios.post("https://openrouter.ai/api/v1/chat/completions", {
             model: "qwen/qwen-2.5-coder-32b-instruct",
-            messages: [{ role: "user", content: prompt }]
+            messages: [
+              { role: "system", content: AUTONOMOUS_SYSTEM_PROMPT },
+              { role: "user", content: prompt }
+            ]
           }, {
             headers: {
               "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
               "HTTP-Referer": "https://thinkmym.com",
               "X-Title": "ODDS Local Bridge"
             },
-            timeout: 30000
+            timeout: 300000
           });
 
           return { text: openRouterRes.data.choices[0].message.content };
@@ -102,101 +109,52 @@ export class Engine {
   async sendWeb(prompt, attachments) {
     const res = await axios.post(
       this.webURL,
-      {
-        model: "web-model",
-        prompt,
-        attachments
-      },
-      {
-        headers: { Authorization: `Bearer ${this.webKey}` }
-      }
+      { model: "web-model", prompt, attachments },
+      { headers: { Authorization: `Bearer ${this.webKey}` } }
     );
-
     return res.data;
   }
 
   async generateLocalAudio({ prompt, lyrics = "", duration_sec = 30, output_path } = {}) {
     const safePrompt = typeof prompt === "string" ? prompt.trim() : "";
-    if (!safePrompt) {
-      throw new Error("Music prompt is required");
-    }
+    if (!safePrompt) throw new Error("Music prompt is required");
 
     const scriptPath = path.resolve(process.cwd(), "local_audio_engine.py");
-    const pythonBin = process.platform === "win32" ? "python" : process.env.PYTHON_BIN || "python3";
-
-    const modelCandidates = [
-      process.env.ACE_STEP_MODEL_DIR,
-      "C:\\mymlo\\ACE-Step-1.5",
-      "C:\\mymlo\\models\\ace-step-1.5",
-      path.resolve(process.cwd(), "ACE-Step-1.5"),
-      path.resolve(process.cwd(), "models", "ace-step-1.5"),
-    ].filter(Boolean);
-
-    const resolvedModel = modelCandidates.find((candidate) => {
-      try {
-        return fs.existsSync(candidate);
-      } catch {
-        return false;
-      }
-    });
+    const pythonBin = process.platform === "win32" ? "python" : "python3";
 
     const args = [
       scriptPath,
-      "--prompt",
-      safePrompt,
-      "--lyrics",
-      String(lyrics || ""),
-      "--duration",
-      String(duration_sec),
+      "--prompt", safePrompt,
+      "--lyrics", String(lyrics || ""),
+      "--duration", String(duration_sec)
     ];
 
     if (output_path) args.push("--output_path", output_path);
-    if (resolvedModel) args.push("--model_dir", resolvedModel);
 
     const child = spawnSync(pythonBin, args, {
       cwd: process.cwd(),
       encoding: "utf8",
-      env: {
-        ...process.env,
-        PYTHONUNBUFFERED: "1"
-      }
+      env: { ...process.env, PYTHONUNBUFFERED: "1" }
     });
 
-    if (child.error) {
-      throw child.error;
-    }
+    if (child.error) throw child.error;
+    if (child.status !== 0) throw new Error(child.stderr || child.stdout || "Audio engine failed");
 
     const stdout = child.stdout ? child.stdout.trim() : "";
-    const stderr = child.stderr ? child.stderr.trim() : "";
+    const outputLines = stdout.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    let parsedResult = null;
 
-    if (child.status !== 0) {
-      throw new Error(stderr || stdout || "Audio engine failed");
+    for (let i = outputLines.length - 1; i >= 0; i--) {
+      try {
+        parsedResult = JSON.parse(outputLines[i]);
+        break;
+      } catch {
+        // continue
+      }
     }
 
-    const parsedJSON = stdout
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter(Boolean)
-      .reverse()
-      .find((line) => {
-        try {
-          JSON.parse(line);
-          return true;
-        } catch {
-          return false;
-        }
-      });
-
-    if (!parsedJSON) {
-      throw new Error(stderr || stdout || "Audio engine returned no JSON payload");
-    }
-
-    const parsed = JSON.parse(parsedJSON);
-    if (parsed?.status === "error") {
-      throw new Error(parsed.error || "Audio engine error");
-    }
-
-    return parsed;
+    if (!parsedResult) throw new Error("Audio engine returned no JSON payload");
+    return parsedResult;
   }
 
   recover() {

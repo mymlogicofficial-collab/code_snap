@@ -219,6 +219,17 @@ function appendMessage(sender, text, mediaObj = null) {
       videoPlayer.src = mediaObj.output_path.startsWith('http') || mediaObj.output_path.startsWith('/') ? mediaObj.output_path : `/api/read-file?path=${encodeURIComponent(mediaObj.output_path)}`;
       bubbleDiv.appendChild(videoPlayer);
     }
+
+    if ((mediaObj.image_path || mediaObj.output_path) && (mediaObj.image_path || mediaObj.output_path).match(/\.(png|jpg|jpeg|svg|webp)$/i)) {
+      const imgPath = mediaObj.image_path || mediaObj.output_path;
+      const imgElem = document.createElement('img');
+      imgElem.className = 'msg-media';
+      imgElem.style.maxHeight = '320px';
+      imgElem.style.borderRadius = '12px';
+      imgElem.style.marginTop = '10px';
+      imgElem.src = imgPath.startsWith('http') || imgPath.startsWith('/') ? imgPath : `/api/read-file?path=${encodeURIComponent(imgPath)}`;
+      bubbleDiv.appendChild(imgElem);
+    }
   }
 
   msgDiv.appendChild(avatarDiv);

@@ -1,5 +1,5 @@
 import * as CodeSkill from "./skills/code.js";
-import * as CoderSkill from "./skills/coder.js"; // Added import
+import * as CoderSkill from "./skills/coder.js";
 import * as FileSkill from "./skills/files.js";
 import * as ImageSkill from "./skills/images.js";
 import * as VoiceSkill from "./skills/voice.js";
@@ -27,7 +27,7 @@ export class AgentRouter {
       case "voice":       return VoiceSkill.run(this.core, input);
       case "system":      return SystemSkill.run(this.core, input);
       case "code":        return CodeSkill.run(this.core, input);
-      case "coder":       return CoderSkill.run(this.core, input); // Added route
+      case "coder":       return CoderSkill.run(this.core, input);
       case "autoskill":   return AutoSkill.run(this.core, input);
       case "diagnostics": return DiagnosticsSkill.run(this.core, input);
       case "execute":     return ExecuteSkill.run(this.core, input);
@@ -38,16 +38,26 @@ export class AgentRouter {
         const rawOutput = await this.core.think(input.text || input);
         const textContent = typeof rawOutput === "string" ? rawOutput : rawOutput?.text || "";
 
-        // Extract filename and code blocks (supports Python/JS, code fences, and custom prefixes)
-        const fileMatch = textContent.match(/```(?:javascript|js|json|html|css|python)?\s*\n(?:\/\/|#)\s*(?:filename:)?\s*([^\n]+)\n([\s\S]*?)```/i) || textContent.match(/(?:javascript|python):([a-zA-Z0-9_./-]+)\n([\s\S]*?)```/i);
+        let filePath = null;
+        let content = null;
 
-        if (fileMatch) {
-          const filePath = fileMatch[1].trim();
-          const content = fileMatch[2];
+        // 1. Check for inline prefixes like python:hello_world.py
+        const inlineMatch = textContent.match(/^(?:python|javascript|js):([a-zA-Z0-9_./-]+)\s*[\r\n]+([\s\S]*)$/i);
+        if (inlineMatch) {
+          filePath = inlineMatch[1].trim();
+          content = inlineMatch[2].replace(/^["']|["']$/g, "").trim();
+        } else {
+          // 2. Fallback check for markdown code blocks with filename comments
+          const fileMatch = textContent.match(/```(?:javascript|js|json|html|css|python)?\s*\n(?:\/\/|#)\s*(?:filename:)?\s*([^\n]+)\n([\s\S]*?)```/i) 
+                         || textContent.match(/(?:javascript|python):([a-zA-Z0-9_./-]+)\n([\s\S]*?)```/i);
+          if (fileMatch) {
+            filePath = fileMatch[1].trim();
+            content = fileMatch[2];
+          }
+        }
 
+        if (filePath && content) {
           console.log(`[AgentRouter] Intercepted file block for ${filePath}. Triggering CoderSkill...`);
-
-          // Execute physical write to disk via CoderSkill
           const result = await CoderSkill.run(this.core, { filePath, content });
           return { text: textContent, execution: result };
         }

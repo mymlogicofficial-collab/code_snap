@@ -1,4 +1,5 @@
 import * as CodeSkill from "./skills/code.js";
+import * as CoderSkill from "./skills/coder.js"; // Added import
 import * as FileSkill from "./skills/files.js";
 import * as ImageSkill from "./skills/images.js";
 import * as VoiceSkill from "./skills/voice.js";
@@ -26,12 +27,34 @@ export class AgentRouter {
       case "voice":       return VoiceSkill.run(this.core, input);
       case "system":      return SystemSkill.run(this.core, input);
       case "code":        return CodeSkill.run(this.core, input);
+      case "coder":       return CoderSkill.run(this.core, input); // Added route
       case "autoskill":   return AutoSkill.run(this.core, input);
       case "diagnostics": return DiagnosticsSkill.run(this.core, input);
       case "execute":     return ExecuteSkill.run(this.core, input);
       case "music":       return MusicSkill.run(this.core, input);
       case "video":       return VideoSkill.run(this.core, input);
-      default:            return this.core.think(input.text);
+      default: {
+        // Fallback: prompt the model to think
+        const rawOutput = await this.core.think(input.text || input);
+        const textContent = typeof rawOutput === "string" ? rawOutput : rawOutput?.text || "";
+
+        // Extract filename and code blocks from qwen2.5-coder response
+        const fileMatch = textContent.match(/```(?:javascript|js|json|html|css)?\s*\n\/\/\s*filename:\s*([^\n]+)\n([\s\S]*?)```/i)
+                       || textContent.match(/javascript:([a-zA-Z0-9_./-]+)\n([\s\S]*?)```/i);
+
+        if (fileMatch) {
+          const filePath = fileMatch[1].trim();
+          const content = fileMatch[2];
+
+          console.log(`[AgentRouter] Intercepted file block for ${filePath}. Triggering CoderSkill...`);
+
+          // Execute physical write to disk via CoderSkill
+          const result = await CoderSkill.run(this.core, { filePath, content });
+          return { text: textContent, execution: result };
+        }
+
+        return rawOutput;
+      }
     }
   }
 }

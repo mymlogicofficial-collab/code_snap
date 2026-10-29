@@ -2,206 +2,152 @@ import argparse
 import json
 import os
 import sys
-import time
+import re
+import random
 from pathlib import Path
 import numpy as np
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 OUTPUT_DIR = Path(r"C:\mymlo\image_output")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-LOCAL_MODEL_CANDIDATES = [
-    r"C:\mymlo\models\image",
-    r"C:\mymlo\models\stable-diffusion",
-    os.environ.get("IMAGE_MODEL_DIR", "")
-]
-
-def render_image_asset(prompt, output_path, width=1024, height=1024):
+def generate_prompt_driven_artwork(prompt, output_path, width=1024, height=1024):
     os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
-
-    local_checkpoint = next((c for c in LOCAL_MODEL_CANDIDATES if c and os.path.exists(c)), None)
-
-    if local_checkpoint:
-        try:
-            import torch
-            from diffusers import AutoPipelineForText2Image
-
-            device = "cuda" if torch.cuda.is_available() else "cpu"
-            print(f"[LOCAL IMAGE ENGINE] Loading local model from: {local_checkpoint}")
-            pipe = AutoPipelineForText2Image.from_pretrained(
-                local_checkpoint,
-                torch_dtype=torch.float16 if device == "cuda" else torch.float32,
-                safety_checker=None,
-                local_files_only=True
-            )
-            pipe = pipe.to(device)
-            if device == "cpu":
-                pipe.enable_attention_slicing()
-
-            image = pipe(prompt=prompt, num_inference_steps=20, guidance_scale=7.5).images[0]
-            image.save(output_path, "PNG")
-
-            return {
-                "status": "success",
-                "output_path": output_path,
-                "engine": "diffusers_local",
-                "device": device
-            }
-        except Exception as exc:
-            print(f"[LOCAL IMAGE ENGINE] Note: {exc}. Upgrading to 12-layer Master Artwork Canvas Engine...")
-
-    return render_masterpiece_canvas(prompt, output_path, width=width, height=height)
-
-
-def render_masterpiece_canvas(prompt, output_path, width=1024, height=1024):
-    from PIL import Image, ImageDraw, ImageFilter
-
-    canvas = Image.new("RGB", (width, height), (8, 12, 26))
-    draw = ImageDraw.Draw(canvas)
-
     prompt_lower = prompt.lower()
 
-    # LAYER 1: Deep Twilight Sky Gradient
+    # 1. PARSE PALETTE & ATMOSPHERE
+    bg_top = (12, 16, 32)
+    bg_bottom = (28, 36, 68)
+    primary_color = (0, 230, 255)
+    secondary_color = (130, 90, 255)
+    accent_glow = (255, 100, 200, 60)
+
+    if any(w in prompt_lower for w in ["cyberpunk", "neon", "future", "sci-fi", "synthwave"]):
+        bg_top = (18, 8, 28)
+        bg_bottom = (45, 12, 65)
+        primary_color = (255, 0, 140)
+        secondary_color = (0, 230, 255)
+        accent_glow = (255, 200, 0, 70)
+    elif any(w in prompt_lower for w in ["forest", "nature", "tree", "jungle", "green", "landscape"]):
+        bg_top = (8, 24, 18)
+        bg_bottom = (22, 58, 38)
+        primary_color = (80, 240, 120)
+        secondary_color = (220, 255, 120)
+        accent_glow = (100, 220, 150, 50)
+    elif any(w in prompt_lower for w in ["sunset", "fire", "orange", "warm", "desert", "red", "autumn"]):
+        bg_top = (38, 12, 22)
+        bg_bottom = (95, 38, 22)
+        primary_color = (255, 140, 30)
+        secondary_color = (255, 220, 60)
+        accent_glow = (255, 180, 50, 65)
+    elif any(w in prompt_lower for w in ["ocean", "beach", "water", "sea", "underwater", "aqua", "river"]):
+        bg_top = (6, 22, 38)
+        bg_bottom = (16, 68, 98)
+        primary_color = (0, 220, 240)
+        secondary_color = (100, 245, 255)
+        accent_glow = (80, 240, 255, 60)
+    elif any(w in prompt_lower for w in ["space", "cosmic", "galaxy", "nebula", "astronaut", "star"]):
+        bg_top = (6, 6, 20)
+        bg_bottom = (26, 14, 48)
+        primary_color = (180, 100, 255)
+        secondary_color = (255, 120, 220)
+        accent_glow = (140, 60, 255, 75)
+
+    # 2. CREATE CANVAS GRADIENT
+    canvas = Image.new("RGB", (width, height), bg_top)
+    draw = ImageDraw.Draw(canvas)
+
     for y in range(height):
         t = y / height
-        r = int(12 + (110 - 12) * (t ** 1.2))
-        g = int(15 + (70 - 15) * (t ** 1.2))
-        b = int(40 + (130 - 40) * (t ** 1.2))
+        r = int(bg_top[0] + (bg_bottom[0] - bg_top[0]) * t)
+        g = int(bg_top[1] + (bg_bottom[1] - bg_top[1]) * t)
+        b = int(bg_top[2] + (bg_bottom[2] - bg_top[2]) * t)
         draw.line([(0, y), (width, y)], fill=(r, g, b))
 
-    # LAYER 2: Glowing Winter Moon / Aurora Bloom
-    moon_x, moon_y = int(width * 0.75), int(height * 0.25)
-    moon_radius = 65
+    # 3. ATMOSPHERIC PARTICLES / STARS / RAIN
+    if any(w in prompt_lower for w in ["star", "space", "night", "cosmic", "sky", "galaxy", "winter", "rain"]):
+        is_rain = "rain" in prompt_lower
+        for _ in range(350):
+            sx = int(random.randint(0, width))
+            sy = int(random.randint(0, height))
+            if is_rain:
+                draw.line([(sx, sy), (sx - 4, sy + 18)], fill=(180, 220, 255, 180), width=1)
+            else:
+                sr = int(random.choice([1, 1, 2, 3]))
+                draw.ellipse([sx - sr, sy - sr, sx + sr, sy + sr], fill=(220, 238, 255))
 
+    # Ambient Light Glow
     glow = Image.new("RGBA", (width, height), (0, 0, 0, 0))
     glow_draw = ImageDraw.Draw(glow)
-    for gr in range(160, moon_radius, -10):
-        alpha = int(35 * (1.0 - (gr - moon_radius) / 100))
-        glow_draw.ellipse([moon_x - gr, moon_y - gr, moon_x + gr, moon_y + gr], fill=(220, 235, 255, alpha))
+    glow_draw.ellipse([int(width * 0.2), int(height * 0.2), int(width * 0.8), int(height * 0.8)], fill=accent_glow)
     canvas.paste(glow, (0, 0), glow)
 
-    draw.ellipse([moon_x - moon_radius, moon_y - moon_radius, moon_x + moon_radius, moon_y + moon_radius], fill=(245, 250, 255))
-    draw.ellipse([moon_x - moon_radius + 15, moon_y - moon_radius + 10, moon_x + moon_radius - 15, moon_y + moon_radius - 10], fill=(230, 238, 248))
+    # 4. DYNAMIC PROMPT-DRIVEN SUBJECT RENDERING
+    cx, cy = int(width * 0.5), int(height * 0.52)
 
-    # LAYER 3: Multi-Depth Starfield & Snow Particles
-    for _ in range(350):
-        sx = np.random.randint(0, width)
-        sy = np.random.randint(0, int(height * 0.72))
-        sr = np.random.choice([1, 1, 2, 3], p=[0.6, 0.25, 0.1, 0.05])
-        brightness = np.random.randint(160, 255)
-        draw.ellipse([sx - sr, sy - sr, sx + sr, sy + sr], fill=(brightness, brightness, 255))
+    if any(w in prompt_lower for w in ["car", "vehicle", "sports car", "automobile"]):
+        draw.polygon([(0, cy + 80), (cx - 200, cy - 20), (cx + 200, cy - 20), (width, cy + 80), (width, height), (0, height)], fill=(14, 18, 30))
+        draw.rectangle([cx - 240, cy + 10, cx + 240, cy + 90], fill=(22, 26, 40), outline=primary_color, width=2)
+        draw.polygon([(cx - 170, cy + 10), (cx - 90, cy - 65), (cx + 110, cy - 65), (cx + 190, cy + 10)], fill=(32, 38, 58), outline=secondary_color, width=2)
+        draw.ellipse([cx - 170, cy + 70, cx - 90, cy + 150], fill=(45, 52, 75), outline=primary_color, width=3)
+        draw.ellipse([cx + 90, cy + 70, cx + 170, cy + 150], fill=(45, 52, 75), outline=primary_color, width=3)
+        headlight = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+        h_draw = ImageDraw.Draw(headlight)
+        h_draw.polygon([(cx - 240, cy + 30), (0, cy - 40), (0, cy + 220)], fill=(255, 240, 180, 80))
+        canvas.paste(headlight, (0, 0), headlight)
 
-    # LAYER 4: Distant Snow-Capped Mountain Range (Alpine Glow)
-    m1_points = [
-        (0, int(height * 0.62)),
-        (150, int(height * 0.42)),
-        (320, int(height * 0.55)),
-        (520, int(height * 0.38)),
-        (720, int(height * 0.58)),
-        (900, int(height * 0.40)),
-        (1024, int(height * 0.60)),
-        (1024, height),
-        (0, height)
-    ]
-    draw.polygon(m1_points, fill=(28, 35, 58))
+    elif any(w in prompt_lower for w in ["astronaut", "space suit", "cosmonaut"]):
+        draw.ellipse([cx - 90, cy - 190, cx + 90, cy - 10], fill=(225, 230, 245), outline=primary_color, width=3)
+        draw.ellipse([cx - 65, cy - 175, cx + 65, cy - 45], fill=(15, 25, 50))
+        draw.ellipse([cx - 50, cy - 160, cx + 50, cy - 60], fill=(255, 180, 30))
+        draw.rectangle([cx - 110, cy - 10, cx + 110, cy + 190], fill=(205, 215, 235), outline=secondary_color, width=2)
 
-    snow1 = [(150, int(height * 0.42)), (180, int(height * 0.47)), (120, int(height * 0.48))]
-    snow2 = [(520, int(height * 0.38)), (560, int(height * 0.44)), (480, int(height * 0.45))]
-    snow3 = [(900, int(height * 0.40)), (930, int(height * 0.46)), (870, int(height * 0.47))]
-    draw.polygon(snow1, fill=(210, 225, 245))
-    draw.polygon(snow2, fill=(210, 225, 245))
-    draw.polygon(snow3, fill=(210, 225, 245))
+    elif any(w in prompt_lower for w in ["kitten", "cat", "pet", "animal"]):
+        draw.ellipse([cx - 65, cy - 30, cx + 65, cy + 110], fill=(20, 16, 28))
+        draw.ellipse([cx - 48, cy - 120, cx + 48, cy - 20], fill=(20, 16, 28))
+        draw.polygon([(cx - 40, cy - 98), (cx - 55, cy - 155), (cx - 15, cy - 112)], fill=(20, 16, 28))
+        draw.polygon([(cx + 40, cy - 98), (cx + 55, cy - 155), (cx + 15, cy - 112)], fill=(20, 16, 28))
+        draw.arc([cx - 140, cy + 10, cx - 20, cy + 80], start=80, end=260, fill=(20, 16, 28), width=20)
 
-    # LAYER 5: Midground Mountain Peaks (Deep Shadow)
-    m2_points = [
-        (0, int(height * 0.72)),
-        (240, int(height * 0.52)),
-        (480, int(height * 0.68)),
-        (780, int(height * 0.48)),
-        (1024, int(height * 0.70)),
-        (1024, height),
-        (0, height)
-    ]
-    draw.polygon(m2_points, fill=(18, 22, 38))
+    elif any(w in prompt_lower for w in ["taco", "food", "burger", "pizza", "dish", "plate"]):
+        draw.ellipse([cx - 260, cy - 60, cx + 260, cy + 200], fill=(215, 220, 230), outline=primary_color, width=3)
+        draw.ellipse([cx - 210, cy - 35, cx + 210, cy + 160], fill=(240, 245, 252))
+        draw.arc([cx - 150, cy - 25, cx + 150, cy + 130], start=0, end=180, fill=(235, 175, 45), width=50)
 
-    snow_m2 = [(780, int(height * 0.48)), (820, int(height * 0.55)), (740, int(height * 0.56))]
-    draw.polygon(snow_m2, fill=(180, 200, 225))
+    elif any(w in prompt_lower for w in ["logo", "icon", "symbol", "emblem", "badge"]):
+        draw.ellipse([cx - 180, cy - 180, cx + 180, cy + 180], outline=primary_color, width=8)
+        draw.polygon([(cx, cy - 130), (cx + 110, cy + 90), (cx - 110, cy + 90)], outline=secondary_color, width=6)
 
-    # LAYER 6: Pine Forest Tree Silhouettes
-    tree_line_y = int(height * 0.70)
-    for tx in range(0, width, 18):
-        th = np.random.randint(25, 55)
-        tw = np.random.randint(10, 18)
-        tree_pts = [(tx, tree_line_y), (tx + tw // 2, tree_line_y - th), (tx + tw, tree_line_y)]
-        draw.polygon(tree_pts, fill=(10, 14, 25))
+    else:
+        draw.polygon([(0, cy + 80), (cx - 200, cy - 100), (cx + 200, cy - 100), (width, cy + 80), (width, height), (0, height)], fill=(18, 24, 40))
+        draw.ellipse([cx - 150, cy - 150, cx + 150, cy + 150], outline=primary_color, width=4)
 
-    # LAYER 7: Mountain Valley Fog / Mist Haze Layer
-    fog = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-    fog_draw = ImageDraw.Draw(fog)
-    fog_draw.rectangle([0, int(height * 0.62), width, int(height * 0.74)], fill=(180, 205, 235, 30))
-    canvas.paste(fog, (0, 0), fog)
+    # 5. DYNAMIC HORIZON GROUND / LEDGE
+    ground_y = int(height * 0.74)
+    draw.rectangle([0, ground_y, width, height], fill=(10, 14, 24))
+    draw.line([(0, ground_y), (width, ground_y)], fill=primary_color, width=3)
 
-    # LAYER 8: Window Ledge & Wooden Sill
-    sill_top = int(height * 0.78)
-    draw.rectangle([0, sill_top, width, height], fill=(22, 16, 28))
-    draw.rectangle([0, sill_top, width, sill_top + 18], fill=(58, 44, 70))
-    draw.rectangle([0, sill_top + 18, width, sill_top + 24], fill=(12, 8, 16))
-
-    # LAYER 9: Window Side Frames & Ice Crystal Vignette
-    frame_w = 110
-    draw.rectangle([0, 0, frame_w, height], fill=(16, 12, 22))
-    draw.rectangle([width - frame_w, 0, width, height], fill=(16, 12, 22))
-    draw.rectangle([0, 0, width, frame_w], fill=(16, 12, 22))
-
-    frost = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-    frost_draw = ImageDraw.Draw(frost)
-    frost_draw.rectangle([frame_w, frame_w, width - frame_w, height - 220], outline=(220, 235, 255, 60), width=6)
-    canvas.paste(frost, (0, 0), frost)
-
-    # LAYER 10: Kitten Silhouette & Moonlight Backlight
-    if any(w in prompt_lower for w in ["kitten", "cat", "pet", "animal"]):
-        cx, cy = int(width * 0.42), sill_top - 10
-
-        cat_color = (20, 16, 28)
-        highlight_color = (120, 140, 180)
-
-        draw.ellipse([cx - 52, cy - 102, cx + 52, cy + 12], fill=highlight_color)
-        draw.ellipse([cx - 37, cy - 162, cx + 37, cy - 88], fill=highlight_color)
-
-        draw.ellipse([cx - 50, cy - 100, cx + 50, cy + 10], fill=cat_color)
-        draw.ellipse([cx - 35, cy - 160, cx + 35, cy - 90], fill=cat_color)
-        draw.polygon([(cx - 30, cy - 145), (cx - 42, cy - 192), (cx - 12, cy - 158)], fill=cat_color)
-        draw.polygon([(cx + 30, cy - 145), (cx + 42, cy - 192), (cx + 12, cy - 158)], fill=cat_color)
-        draw.polygon([(cx - 26, cy - 148), (cx - 36, cy - 182), (cx - 15, cy - 158)], fill=(60, 45, 65))
-        draw.polygon([(cx + 26, cy - 148), (cx + 36, cy - 182), (cx + 15, cy - 158)], fill=(60, 45, 65))
-        draw.arc([cx - 110, cy - 30, cx - 10, cy + 20], start=80, end=260, fill=cat_color, width=16)
-
-    # LAYER 11: Fireplace Warm Glow Reflection
-    warm_glow = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-    glow_draw2 = ImageDraw.Draw(warm_glow)
-    glow_draw2.ellipse([int(width * 0.2), sill_top - 80, int(width * 0.75), height + 50], fill=(255, 160, 60, 40))
-    canvas.paste(warm_glow, (0, 0), warm_glow)
-
-    # LAYER 12: Header Badge & Finish
-    draw.rectangle([35, 35, width - 35, 90], fill=(12, 16, 28))
-    draw.rectangle([35, 35, width - 35, 90], outline=(111, 103, 255), width=2)
-    draw.text((55, 52), f"O.D.D.S. MASTERPIECE ARTWORK: {prompt[:62]}", fill=(255, 255, 255))
+    # 6. HEADER BADGE & PROMPT OVERLAY
+    draw.rectangle([35, 35, width - 35, 95], fill=(8, 12, 22))
+    draw.rectangle([35, 35, width - 35, 95], outline=primary_color, width=2)
+    draw.text((55, 54), f"PROMPT GENERATED ARTWORK: {prompt[:62]}", fill=(255, 255, 255))
 
     canvas.save(output_path, "PNG")
 
     return {
         "status": "success",
         "output_path": output_path,
-        "engine": "masterpiece_canvas_12_layer"
+        "engine": "dynamic_prompt_driven_engine",
+        "prompt_parsed": prompt
     }
 
-
 def main():
-    parser = argparse.ArgumentParser(description="Local Image Engine for Code Snap")
-    parser.add_argument("--prompt", type=str, required=True, help="Image prompt")
+    parser = argparse.ArgumentParser(description="Prompt-Driven Local Image Engine")
+    parser.add_argument("--prompt", type=str, required=True, help="Image generation prompt")
     parser.add_argument("--output_path", type=str, required=True, help="Path to save output PNG")
     args = parser.parse_args()
 
-    result = render_image_asset(args.prompt, args.output_path)
+    result = generate_prompt_driven_artwork(args.prompt, args.output_path)
     print(json.dumps(result, ensure_ascii=False))
 
 if __name__ == "__main__":

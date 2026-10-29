@@ -15,7 +15,8 @@ export class Engine {
   constructor(config) {
     this.mode = config.mode;
     this.localURL = config.localURL;
-    this.localModel = config.localModel;
+    this.localModel = config.localModel || "qwen2.5-coder:latest";
+    this.visionModel = config.secondaryModel || "llava-phi3:3.8b";
     this.webURL = config.webURL;
     this.webKey = config.webKey;
 
@@ -56,8 +57,13 @@ export class Engine {
 
     const fullPrompt = `${AUTONOMOUS_SYSTEM_PROMPT}\nUSER REQUEST: ${prompt}`;
 
+    // Assign llava-phi3:3.8b for image vision analysis, qwen2.5-coder for text/code
+    const activeModel = attachments.image
+      ? (attachments.model || this.visionModel)
+      : (attachments.model || this.localModel);
+
     const payload = {
-      model: attachments.model || this.localModel,
+      model: activeModel,
       prompt: fullPrompt,
       stream: false
     };
@@ -65,36 +71,37 @@ export class Engine {
     if (attachments.image) payload.images = [attachments.image];
 
     try {
+      console.log(`[Engine] Sending request to Ollama using model [${activeModel}]`);
       const res = await axios.post(target, payload, { timeout: 300000 });
 
       if (res?.data && typeof res.data === "object") {
         if (res.data.response && res.data.response.trim().length > 0) {
-          return { text: res.data.response };
+          return { text: res.data.response, modelUsed: activeModel };
         }
         if (res.data.result && res.data.result.trim().length > 0) {
-          return { text: res.data.result };
+          return { text: res.data.result, modelUsed: activeModel };
         }
 
         if (res.data.done_reason === "load" || !res.data.response || res.data.response.trim() === "") {
-          console.log("[Engine] Ollama model finished loading into RAM. Retrying generation...");
+          console.log(`[Engine] Ollama model [${activeModel}] loaded into RAM. Retrying generation...`);
           const retryRes = await axios.post(target, payload, { timeout: 300000 });
           if (retryRes?.data?.response && retryRes.data.response.trim().length > 0) {
-            return { text: retryRes.data.response };
+            return { text: retryRes.data.response, modelUsed: activeModel };
           }
         }
 
-        return { text: res.data.response || "Model initialized and ready." };
+        return { text: res.data.response || "Model initialized and ready.", modelUsed: activeModel };
       }
 
-      return { text: String(res?.data || "") };
+      return { text: String(res?.data || ""), modelUsed: activeModel };
 
     } catch (localError) {
-      console.warn("[Engine] Local generation timed out/failed. Checking OpenRouter fallback...");
+      console.warn(`[Engine] Local generation with model [${activeModel}] failed. Checking OpenRouter fallback...`);
 
       if (process.env.OPENROUTER_API_KEY) {
         try {
           const openRouterRes = await axios.post("https://openrouter.ai/api/v1/chat/completions", {
-            model: "qwen/qwen-2.5-coder-32b-instruct",
+            model: attachments.image ? "google/gemini-flash-1.5" : "qwen/qwen-2.5-coder-32b-instruct",
             messages: [
               { role: "system", content: AUTONOMOUS_SYSTEM_PROMPT },
               { role: "user", content: prompt }
@@ -108,7 +115,7 @@ export class Engine {
             timeout: 300000
           });
 
-          return { text: openRouterRes.data.choices[0].message.content };
+          return { text: openRouterRes.data.choices[0].message.content, modelUsed: "openrouter_fallback" };
         } catch (routerErr) {
           throw new Error(`Local failed (${localError.message}) and OpenRouter fallback failed (${routerErr.message})`);
         }

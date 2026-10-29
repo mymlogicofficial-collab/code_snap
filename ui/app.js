@@ -1,12 +1,6 @@
-// O.D.D.S. Digital Design Suite & Creative Guru UI Core
+// O.D.D.S. GURU Digital Design Suite & Creative UI Core
 
-// State & Element References
 let attachedFiles = [];
-let mediaRecorder = null;
-let recordedAudioChunks = [];
-let recordStartTime = 0;
-let recordTimerInterval = null;
-let recordedAudioBlob = null;
 
 // Tab Navigation Elements
 const tabButtons = document.querySelectorAll('.tab-btn');
@@ -185,12 +179,11 @@ function appendMessage(sender, text, mediaObj = null) {
   const headerDiv = document.createElement('div');
   headerDiv.className = 'msg-header';
   const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  headerDiv.textContent = `${sender === 'user' ? 'You' : 'Digital Design Guru'} • ${timeStr}`;
+  headerDiv.textContent = `${sender === 'user' ? 'You' : 'O.D.D.S. GURU'} • ${timeStr}`;
 
   const contentDiv = document.createElement('div');
   contentDiv.className = 'msg-content';
 
-  // Format code blocks if present
   let formattedText = escapeHtml(text || '');
   formattedText = formattedText.replace(/```([\s\S]*?)```/g, (match, p1) => {
     return `<pre><code>${p1.trim()}</code></pre>`;
@@ -200,7 +193,6 @@ function appendMessage(sender, text, mediaObj = null) {
   bubbleDiv.appendChild(headerDiv);
   bubbleDiv.appendChild(contentDiv);
 
-  // Render media attachments if present
   if (mediaObj) {
     if (mediaObj.master_wav || mediaObj.audio) {
       const audioPath = mediaObj.master_wav || mediaObj.audio;
@@ -240,13 +232,12 @@ function appendMessage(sender, text, mediaObj = null) {
 }
 
 function escapeHtml(str) {
-  return str
+  return String(str || '')
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 }
 
-// FILE UPLOAD HELPER
 async function uploadFiles(files) {
   const uploadedPaths = [];
   for (let file of files) {
@@ -311,72 +302,6 @@ if (chatInput) {
   });
 }
 
-// VOICE & LYRICS RECORDING SUITE
-if (recordLyricsBtn) {
-  recordLyricsBtn.addEventListener('click', toggleVoiceRecord);
-}
-
-async function toggleVoiceRecord() {
-  if (mediaRecorder && mediaRecorder.state === 'recording') {
-    // Stop recording
-    mediaRecorder.stop();
-    recordLyricsBtn.classList.remove('recording');
-    recBtnText.textContent = 'Record Voice / Lyrics';
-    clearInterval(recordTimerInterval);
-  } else {
-    // Start recording
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      recordedAudioChunks = [];
-      mediaRecorder = new MediaRecorder(stream);
-
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) recordedAudioChunks.push(e.data);
-      };
-
-      mediaRecorder.onstop = () => {
-        recordedAudioBlob = new Blob(recordedAudioChunks, { type: 'audio/wav' });
-        const audioUrl = URL.createObjectURL(recordedAudioBlob);
-        if (audioPreviewPlayer) audioPreviewPlayer.src = audioUrl;
-        if (audioPreviewContainer) audioPreviewContainer.classList.remove('hidden');
-
-        // Add recorded audio to chat attachments
-        const recFile = new File([recordedAudioBlob], `vocal_record_${Date.now()}.wav`, { type: 'audio/wav' });
-        addAttachment(recFile);
-      };
-
-      mediaRecorder.start();
-      recordLyricsBtn.classList.add('recording');
-      recBtnText.textContent = 'Stop Recording';
-
-      recordStartTime = Date.now();
-      recordTimerInterval = setInterval(updateRecordTimer, 500);
-    } catch (err) {
-      alert(`Microphone access error: ${err.message}`);
-    }
-  }
-}
-
-function updateRecordTimer() {
-  if (!recordTimer) return;
-  const elapsedSec = Math.floor((Date.now() - recordStartTime) / 1000);
-  const mins = String(Math.floor(elapsedSec / 60)).padStart(2, '0');
-  const secs = String(elapsedSec % 60).padStart(2, '0');
-  recordTimer.textContent = `${mins}:${secs}`;
-}
-
-if (audioFileInput) {
-  audioFileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      addAttachment(file);
-      const audioUrl = URL.createObjectURL(file);
-      if (audioPreviewPlayer) audioPreviewPlayer.src = audioUrl;
-      if (audioPreviewContainer) audioPreviewContainer.classList.remove('hidden');
-    }
-  });
-}
-
 // MUSIC GENERATION
 if (generateMusicBtn) {
   generateMusicBtn.addEventListener('click', async () => {
@@ -386,13 +311,13 @@ if (generateMusicBtn) {
 
     const combinedPrompt = `${styleVal ? '[' + styleVal + '] ' : ''}${promptVal}${lyricsVal ? '\nLyrics: ' + lyricsVal : ''}`;
 
-    if (musicOutput) musicOutput.textContent = '⚡ Generating audio track on local CPU...';
+    if (musicOutput) musicOutput.innerHTML = '<span style="color: var(--accent-cyan); font-weight: 700;">⚡ Generating audio track on local CPU...</span>';
 
     try {
       const res = await fetch('/music', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: combinedPrompt, lyrics: lyricsVal })
+        body: JSON.stringify({ type: 'music', text: combinedPrompt, prompt: combinedPrompt, lyrics: lyricsVal })
       });
       const data = await res.json();
 
@@ -419,16 +344,25 @@ if (generateImageBtn) {
     const promptVal = imagePrompt ? imagePrompt.value.trim() : '';
     if (!promptVal) return;
 
-    if (imageOutput) imageOutput.textContent = '🎨 Rendering logo / visual asset...';
+    if (imageOutput) imageOutput.innerHTML = '<span style="color: var(--accent-cyan); font-weight: 700;">🎨 Rendering logo / visual asset PNG...</span>';
 
     try {
-      const res = await fetch('/image/generate', {
+      const res = await fetch('/api/agent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: promptVal })
+        body: JSON.stringify({ type: 'image', text: promptVal, prompt: promptVal })
       });
       const data = await res.json();
-      if (imageOutput) imageOutput.textContent = JSON.stringify(data, null, 2);
+      const imgPath = data.image_path || data.output_path;
+
+      if (imageOutput) {
+        imageOutput.innerHTML = `
+          <div style="font-weight: 700; color: var(--accent-cyan); margin-bottom: 6px;">🎨 Digital Artwork PNG Rendered</div>
+          <div>${escapeHtml(data.response || data.text || 'Visual asset ready.')}</div>
+          ${imgPath ? `<img src="/api/read-file?path=${encodeURIComponent(imgPath)}" style="width: 100%; max-height: 380px; border-radius: 12px; margin-top: 10px; object-fit: contain;" />` : ''}
+          ${imgPath ? `<div style="margin-top: 8px;"><a href="/api/read-file?path=${encodeURIComponent(imgPath)}" download class="secondary-button" style="display: inline-block; text-decoration: none;">📥 Download PNG Asset</a></div>` : ''}
+        `;
+      }
     } catch (err) {
       if (imageOutput) imageOutput.textContent = `Image Generation Error: ${err.message}`;
     }
@@ -441,20 +375,23 @@ if (generateVideoBtn) {
     const promptVal = videoPrompt ? videoPrompt.value.trim() : '';
     if (!promptVal) return;
 
-    if (videoOutput) videoOutput.textContent = '🎬 Rendering commercial video track on CPU...';
+    if (videoOutput) videoOutput.innerHTML = '<span style="color: var(--accent-cyan); font-weight: 700;">🎬 Rendering commercial video track on CPU...</span>';
 
     try {
-      const res = await fetch('/video', {
+      const res = await fetch('/api/agent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: promptVal })
+        body: JSON.stringify({ type: 'video', text: promptVal, prompt: promptVal })
       });
       const data = await res.json();
+      const videoPath = data.output_path || data.video_path;
 
       if (videoOutput) {
         videoOutput.innerHTML = `
-          <div>${escapeHtml(data.response || 'Video track ready.')}</div>
-          ${data.output_path ? `<video controls src="/api/read-file?path=${encodeURIComponent(data.output_path)}" style="width: 100%; max-height: 280px; margin-top: 10px;"></video>` : ''}
+          <div style="font-weight: 700; color: var(--accent-cyan); margin-bottom: 6px;">🎬 Motion Video Track Rendered</div>
+          <div>${escapeHtml(data.response || data.text || 'Video track ready.')}</div>
+          ${videoPath ? `<video controls src="/api/read-file?path=${encodeURIComponent(videoPath)}" style="width: 100%; max-height: 280px; border-radius: 12px; margin-top: 10px;"></video>` : ''}
+          ${videoPath ? `<div style="margin-top: 8px;"><a href="/api/read-file?path=${encodeURIComponent(videoPath)}" download class="secondary-button" style="display: inline-block; text-decoration: none;">📥 Download MP4 Video</a></div>` : ''}
         `;
       }
     } catch (err) {
@@ -532,4 +469,4 @@ async function checkStatuses() {
 
 // INITIALIZATION
 checkStatuses();
-appendMessage('agent', 'Welcome to O.D.D.S. Digital Design Suite & Creative Guru. Ready for branding, logo design, app architecture, music, video, and code sandbox engineering.');
+appendMessage('agent', 'Welcome to O.D.D.S. GURU — One-stop Digital Design Suite. Ready for branding, logo design, app architecture, music, video, and code sandbox engineering.');

@@ -126,6 +126,28 @@ export async function startServer({ router, port } = {}) {
     }
   });
 
+  // Standardized Agent Router Endpoint (/api/agent)
+  app.post("/api/agent", async (req, res) => {
+    try {
+      const input = req.body || {};
+      const payloadText = input.text || input.prompt || input.message || "";
+      const type = input.type || "text";
+
+      const result = await router.handle({ ...input, type, text: payloadText, prompt: payloadText });
+
+      if (result && typeof result.response === "string") {
+        result.response = autoSaveGeneratedFiles(result.response, payloadText);
+      } else if (result && typeof result.text === "string") {
+        result.text = autoSaveGeneratedFiles(result.text, payloadText);
+      }
+
+      res.json(result);
+    } catch (err) {
+      logError("API.agent", err?.message || String(err));
+      res.status(500).json({ ok: false, error: err?.message });
+    }
+  });
+
   // Core Chat Handler
   app.post("/chat", async (req, res) => {
     try {

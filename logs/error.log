@@ -298,3 +298,7 @@ subprocess.CalledProcessError: Command '['C:\\Users\\mymlo\\AppData\\Local\\Prog
 [2026-10-29T04:55:17.766Z] [Server] ODDS API server starting up...
 [2026-10-29T04:55:17.801Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
 [2026-10-29T04:55:17.805Z] [Server] ODDS API Server listening on port 3000
+[2026-10-29T05:05:52.114Z] [Engine] Initialized in local mode
+[2026-10-29T05:05:52.120Z] [Server] ODDS API server starting up...
+[2026-10-29T05:05:52.123Z] [Proxy] Proxy listening on port 3001, forwarding to http://localhost:11434/api/generate
+[2026-10-29T05:05:52.124Z] [Server] ODDS API Server listening on port 3000

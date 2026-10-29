@@ -23,7 +23,7 @@ export class AgentRouter {
   async handle(input) {
     switch (input.type) {
       case "file":        return FileSkill.run(this.core, input);
-      case "image":       return ImageSkill.run(this.core, input);
+      case "image":       return ImageSkill.run(this.core, input); // Direct image generation pipeline route
       case "voice":       return VoiceSkill.run(this.core, input);
       case "system":      return SystemSkill.run(this.core, input);
       case "code":        return CodeSkill.run(this.core, input);

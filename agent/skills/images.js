@@ -11,12 +11,12 @@ export async function run(core, input) {
     return core.think(visionPrompt, { image: input.file.data });
   }
 
-  // 2. Local Image Rendering via local_image_engine.py
+  // 2. Local Image Rendering via local_image.py
   const safePrompt = typeof promptText === "string" && promptText.trim().length > 0 ? promptText.trim() : "Digital Artwork";
   const targetOutput = path.join("C:\\mymlo\\image_output", `image_${Date.now()}.png`);
 
   try {
-    const scriptPath = path.resolve(process.cwd(), "local_image_engine.py");
+    const scriptPath = path.resolve(process.cwd(), "local_image.py");
     const pythonBin = process.platform === "win32" ? "python" : "python3";
     const args = [
       scriptPath,
@@ -24,7 +24,7 @@ export async function run(core, input) {
       "--output_path", targetOutput
     ];
 
-    console.log(`[IMAGE SKILL] Rendering local PNG image for: "${safePrompt}"`);
+    console.log(`[IMAGE SKILL] Executing local_image.py for: "${safePrompt}"`);
     const child = spawnSync(pythonBin, args, {
       cwd: process.cwd(),
       encoding: "utf8",
@@ -32,7 +32,7 @@ export async function run(core, input) {
     });
 
     if (child.error) throw child.error;
-    if (child.status !== 0) throw new Error(child.stderr || child.stdout || "Image engine execution failed");
+    if (child.status !== 0) throw new Error(child.stderr || child.stdout || "local_image.py execution failed");
 
     const outputLines = (child.stdout || "").split(/\r?\n/).map(l => l.trim()).filter(Boolean);
     let parsedResult = null;
@@ -52,11 +52,11 @@ export async function run(core, input) {
         response: `Digital artwork PNG rendered and saved to ${parsedResult.output_path || targetOutput}`,
         output_path: parsedResult.output_path || targetOutput,
         image_path: parsedResult.output_path || targetOutput,
-        mode: "local_cpu_image"
+        engine: parsedResult.engine || "local_image_py"
       };
     }
   } catch (localErr) {
-    console.warn(`[IMAGE SKILL] Local image engine error (${localErr.message}). Attempting OpenRouter fallback...`);
+    console.warn(`[IMAGE SKILL] local_image.py error (${localErr.message}). Attempting OpenRouter fallback...`);
   }
 
   // 3. OpenRouter Fallback

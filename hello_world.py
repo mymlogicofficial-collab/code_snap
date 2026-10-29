@@ -1,1 +1,1 @@
-print("O.D.D.S. system online")
+print("Hello, World!")

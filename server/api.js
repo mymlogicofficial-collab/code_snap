@@ -80,6 +80,16 @@ export async function startServer({ router, port } = {}) {
     app.get("/marketplace", (req, res) => res.sendFile(path.join(uiDir, "marketplace.html")));
   }
 
+  // --- ADD THESE STATIC ROUTES FOR MEDIA OUTPUTS ---
+  const audioOutputDir = path.resolve("C:\\mymlo\\audio_output");
+  if (!fs.existsSync(audioOutputDir)) fs.mkdirSync(audioOutputDir, { recursive: true });
+  app.use("/audio_output", express.static(audioOutputDir));
+
+  const imageOutputDir = path.resolve("C:\\mymlo\\image_output");
+  if (!fs.existsSync(imageOutputDir)) fs.mkdirSync(imageOutputDir, { recursive: true });
+  app.use("/image_output", express.static(imageOutputDir));
+  // ------------------------------------------------
+
   logInfo("Server", "ODDS API server starting up...");
 
   // Health check

@@ -18,14 +18,12 @@ const PROJECT_ROOT = path.resolve(__dirname, "..");
 function autoSaveGeneratedFiles(text, promptText) {
   if (!text || typeof text !== "string") return text;
 
-  // 1. Check for filename mentioned in user prompt, e.g. "create file project_memory.js" or "named foo.kt"
   let promptTargetFile = null;
   const match = promptText.match(/(?:file|create|named|called|write)\s+([a-zA-Z0-9_./\\-]+\.[a-zA-Z0-9]+)/i);
   if (match) {
     promptTargetFile = match[1];
   }
 
-  // 2. Extract code blocks from LLM response
   const codeBlockRegex = /```(?:[a-zA-Z0-9_+\-]*[:\s]+([a-zA-Z0-9_./\\-]+\.[a-zA-Z0-9]+))?\r?\n([\s\S]*?)```/g;
   let codeMatch;
   const savedFiles = [];
@@ -164,14 +162,12 @@ export async function startServer({ router, port } = {}) {
       const payloadText = req.body.text || req.body.prompt || req.body.message;
       let request = { type: "text", text: payloadText };
 
-      // Route image generation requests directly to ImageSkill
       if (/(?:generate|create|draw|paint|make)\s+(?:an?\s+)?(?:image|picture|artwork|logo|photo|illustration|drawing)/i.test(payloadText)) {
         request = { type: "image", prompt: payloadText, text: payloadText };
       }
 
       const result = await router.handle(request);
 
-      // Auto-extract code blocks and write generated code directly to disk
       if (result && typeof result.response === "string") {
         result.response = autoSaveGeneratedFiles(result.response, payloadText);
       } else if (result && typeof result.text === "string") {
@@ -212,7 +208,7 @@ export async function startServer({ router, port } = {}) {
     }
   });
 
-  // Direct Shell Command Execution Kernel (Executes commands on host machine)
+  // Direct Shell Command Execution Kernel
   app.post("/api/execute-command", async (req, res) => {
     const { command } = req.body;
     if (!command) {
@@ -247,7 +243,7 @@ export async function startServer({ router, port } = {}) {
     }
   });
 
-  // Direct File Reader Endpoint (Streams audio, video, images, or text)
+  // Direct File Reader Endpoint
   app.get("/api/read-file", (req, res) => {
     const targetPath = req.query.path || req.query.filePath;
     if (!targetPath) {
@@ -269,17 +265,11 @@ export async function startServer({ router, port } = {}) {
   // Diagnostics Handler
   app.post("/diagnostics", async (req, res) => {
     try {
-      const result = await router.handle({
-        type: "diagnostics"
-      });
+      const result = await router.handle({ type: "diagnostics" });
       res.json(result);
     } catch (err) {
       logError("API.diagnostics", err?.message || String(err));
-      res.status(500).json({
-        ok: false,
-        error: "Diagnostics failed",
-        details: err?.message
-      });
+      res.status(500).json({ ok: false, error: "Diagnostics failed", details: err?.message });
     }
   });
 
